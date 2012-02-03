@@ -1,0 +1,41 @@
+#oc_images_page_fwd {
+	right: 0;
+}
+#oc_images_page_back {
+	left: 0;
+}
+#oc_image_preview, #oc_filmstrip_wrapper, .cf_balloon h4 {
+	zoom: 1;
+}
+.cf_balloon.imageToken dt, .cf_balloon.imageToken dd {
+	display: inline;
+	float: none;
+}
+.cf_balloon.imageToken dt {
+	margin-right: 5px;
+}
+.cf_balloon.imageToken dd {
+	margin-right: 10px;
+}
+
+#oc_image_preview .frame {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+ul.cf_tokenbox.cloud li.oc_tagToken span.token-text, 
+ul.cf_tokenbox.cloud li.oc_tagToken.suggestedInline, 
+ul.cf_tokenbox.cloud li.oc_tagToken.userInline {
+	white-space:nowrap;
+	overflow: visible;
+}
+ul.cf_tokenbox.cloud li.oc_tagToken span.left-endcap {
+	left:0;
+}
+
+* html #wpbody {
+	_width: expression(document.documentElement.clientWidth > 982 ? "1020px" : "99.9%");
+}
+#oc_api_notifications {
+	margin:0;
+}

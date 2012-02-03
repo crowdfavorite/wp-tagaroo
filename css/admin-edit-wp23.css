@@ -1,0 +1,121 @@
+.ac_results {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	position: absolute;
+	z-index: 10000;
+	display: none;
+	border-width: 1px;
+	border-style: solid;
+	background-color: #fff;
+	border-color: #808080;
+}
+
+.ac_results li {
+	padding: 2px 5px;
+	white-space: nowrap;
+	text-align: left;
+	color: #101010;
+}
+
+.ac_over {
+	cursor: pointer;
+	background-color: #f0f0b8;
+}
+
+.ac_match {
+	text-decoration: underline;
+	color: #000;
+}
+#cf_tokenbox_image_filmstrip {
+	overflow: hidden;
+}
+#oc_images_page_back, #oc_images_page_fwd {
+	top: 35px;
+}
+#oc_suggest_tags_link {
+	color:#fff;
+	top:4px;
+	border:none;
+	right:40px;
+}
+a#oc_suggest_tags_link:hover {
+	text-decoration:underline;
+}
+
+#oc_tag_searching_indicator {
+	color:#fff;
+	right:40px;
+	top:4px;
+}
+
+#oc_tag_controls, #oc_image_controls {
+	margin: 0pt 12px;
+	font-size: 11px;
+}
+#oc_image_controls {
+	padding-top:10px;
+}
+
+
+/* largely copied from wp, which uses #advancedstuff instead of oc-dbx */
+#oc-dbx a.dbx-toggle, #oc-dbx a.dbx-toggle-open:visited {
+	height: 22px;
+	width: 22px;
+	top: 3px;
+	right: 5px;
+	background-position: 0 -3px;
+}
+
+#oc-dbx a.dbx-toggle-open, #oc-dbx a.dbx-toggle-open:visited {
+	height: 22px;
+	width: 22px;
+	top: 3px;
+	right: 5px;
+	background-position: 0 -28px;
+}
+
+#oc-dbx h3.dbx-handle {
+	margin-left: 7px;
+	margin-bottom: -7px;
+	padding: 6px 1em 0 3px;
+	height: 19px;
+	font-size: 12px;
+	background: #2685af url(images/box-head-right.gif) no-repeat top right;
+}
+
+#oc-dbx div.dbx-h-andle-wrapper {
+	margin: 0 0 0 -7px;
+	background: #fff url(images/box-head-left.gif) no-repeat top left;
+}
+
+#oc-dbx div.dbx-content {
+	margin-left: 8px;
+	background: url(images/box-bg-right.gif) repeat-y right;
+	padding: 10px 10px 5px 0;
+}
+
+#oc-dbx div.dbx-c-ontent-wrapper {
+	margin-left: -7px;
+	margin-right: 0;
+	background: url(images/box-bg-left.gif) repeat-y left;
+}
+#oc-dbx fieldset.dbx-box {
+	padding-bottom: 9px;
+	margin-left: 6px;
+	background: url(images/box-butt-right.gif) no-repeat bottom right;
+}
+#oc-dbx div.dbx-b-ox-wrapper {
+	background: url(images/box-butt-left.gif) no-repeat bottom left;
+}
+
+#oc-dbx .dbx-box-closed div.dbx-c-ontent-wrapper {
+	padding-bottom: 2px;
+	background: url(images/box-butt-left.gif) no-repeat bottom left;
+}
+
+#oc-dbx .dbx-box {
+	background: url(images/box-butt-right.gif) no-repeat bottom right;
+	margin: 0 0 10px 0;
+}
+

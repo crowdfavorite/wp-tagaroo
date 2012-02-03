@@ -1,0 +1,230 @@
+/* some default/required css for the token stuff */
+.cf_tokenbox_wrapper {
+	padding:4px;
+	border:1px solid #bbb;
+	margin:0 0 10px;
+	height:200px;
+	overflow:auto;
+	zoom:1;
+	position:relative;
+}
+
+.cf_token {
+	border:1px solid #eee;
+	margin: 4px 4px;
+	cursor: pointer;
+	font-size:10px;
+	zoom:1;
+}
+
+.cf_tokenBoxHighlight {
+}
+
+.cf_imageBoxHighlight {
+	background: #ffc;
+}
+
+.cf_token.inline {
+}
+
+.cf_tokenbox_header {
+	background:#cee1ef;
+	color:#333;
+	padding:3px 4px;
+	margin:0;
+	font-size:11px;
+}
+.cf_tokenbox_header.highlight {
+	background:#bcd7ea;
+}
+
+.cf_token.overlay {
+	position:absolute;
+	visibility: hidden;
+	padding:3px 12px 3px 3px;
+	border:1px solid #aaa;
+	background:#fff;
+	overflow:hidden;
+}
+
+ul.cf_tokenbox {
+	list-style-type:none;
+	padding:0;
+	margin:0;
+}
+
+ul.cf_tokenbox.list li.cf_token.inline {
+	display:block;
+	padding:2px;	
+}
+
+ul.cf_tokenbox.cloud li.cf_token.inline {
+	display:block;
+	float:left;
+	padding:2px;	
+}
+
+/* oc-specific css */
+
+
+.oc_tagToken {
+	cursor: pointer;
+	overflow:hidden;
+	font-size:10px;
+	height: 20px;
+	line-height: 20px;
+	margin: 4px 4px;
+	zoom:1;
+}
+
+.dummy_token-text {
+	font-size:10px;
+}
+
+.selected {
+	background: #598BEC;
+	color:#fff;
+}
+
+.oc_tagToken.suggestedInline {
+}
+.oc_tagToken.suggestedOverlay, .oc_tagToken.userOverlay, .oc_tagToken.ignoredOverlay {
+	position:absolute;
+	visibility: hidden;
+	overflow:hidden;
+	white-space:nowrap;
+}
+
+ul.cf_tokenbox.list li.oc_tagToken.suggestedInline, 
+ul.cf_tokenbox.list li.oc_tagToken.userInline,
+ul.cf_tokenbox.cloud li.oc_tagToken.suggestedInline,
+ul.cf_tokenbox.cloud li.oc_tagToken.userInline {
+	display:block;
+	padding: 0;
+	position: relative;
+	overflow:hidden;
+}
+
+ul.cf_tokenbox.cloud li.oc_tagToken.suggestedInline,
+ul.cf_tokenbox.cloud li.oc_tagToken.userInline {
+	float:left;
+	white-space:nowrap;	
+}
+
+.oc_tagToken span.token-text {
+	display: block;
+	margin: 0 4px 0 10px;
+}
+
+.oc_imageToken.overlay {
+	zoom:1;
+	position:absolute;
+	visibility: hidden;
+	overflow:hidden;
+	border:none;
+	padding:0;	
+	width:250px;
+}
+
+ul.cf_tokenbox.cloud li.oc_imageToken.inline {
+	display:block;
+	float:left;
+	padding:2px;
+	border:1px solid #eee;
+	margin: 2px 2px;
+	cursor: pointer;
+	zoom:1;
+	line-height:0;
+
+}
+ul.cf_tokenbox.cloud li.oc_imageToken.inline.highlight {
+	background:#333;
+}
+ul.cf_tokenbox.cloud li.oc_imageToken.inline img {
+	height: 75px;
+	width: 75px;
+}
+
+
+.cf_tooltip {
+	position:absolute;
+	overflow:hidden;
+	visibility:hidden;	
+	background:#eee;
+	border: 1px solid #888;
+	font-size:10px;	
+}
+.cf_tooltip.tagToken {
+	padding: 4px 10px;
+}
+.cf_tooltip.tagToken h4 {
+	margin: 0;
+	font-weight:bold;
+	color:#000;	
+}
+.cf_balloon {
+	zoom:1;
+	background:#eee;
+	border: 5px solid #fff;
+	font-size:10px;
+	padding: 8px;
+}
+.cf_balloon h4 {
+	font-size: 12px;
+	margin: 0 5px 5px;
+	font-weight:bold;
+	color:#000;
+}
+
+.cf_balloon.imageToken {
+}
+.cf_balloon.imageToken dl {
+	margin: 2px 4px;
+}
+.cf_balloon.imageToken dt {
+	clear: left;
+	float:left;
+	font-weight:bold;
+	margin-right: 5px;
+}
+.cf_balloon.imageToken dd {
+	clear: right;
+	float: left;
+	margin: 0 10px 5px 0;
+}
+.cf_balloon.tagToken h4 {
+	margin:0;
+}
+.cf_balloon.tagToken {
+	padding: 4px 12px 4px 6px;
+}
+.cf_balloon.tagToken ul {
+	padding: 0 0 0 3px;
+}
+.cf_balloon.tagToken li {
+	list-style:none;
+	line-height: 100%;
+}
+
+.oc_tagToken.userInline, .oc_tagToken.userOverlay {
+	border-right: 3px solid #f3d991;
+}
+.oc_tagToken.suggestedInline, .oc_tagToken.suggestedOverlay {
+	border-right: 3px solid #999;
+}
+.oc_tagToken.suggestedInline.person, .oc_tagToken.suggestedOverlay.person {
+	border-right: 3px solid #06c;
+}
+.oc_tagToken.suggestedInline.company, .oc_tagToken.suggestedOverlay.company {
+	border-right: 3px solid #f90;
+}
+.oc_tagToken.suggestedInline.eventfact, .oc_tagToken.suggestedOverlay.eventfact {
+	border-right: 3px solid #c00;
+}
+.oc_tagToken.suggestedInline.city, .oc_tagToken.suggestedOverlay.city {
+	border-right: 3px solid #630;
+}
+.oc_tagToken.suggestedInline.organization, .oc_tagToken.suggestedOverlay.organization {
+	border-right: 3px solid #060;
+}
+
