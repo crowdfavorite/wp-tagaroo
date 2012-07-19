@@ -2,6 +2,10 @@
 // Originally By Brandon Aaron, part of the Dimension Plugin
 // http://jquery.com/plugins/project/dimensions
 // Modified 2010-07-06 for compat with newer versions of jQuery
+
+// Offset overload commented out 1.4.5 to fix errors with WordPress 3.4.1
+//   - Fullscreen and Linking with TinyMCE broken due to error related to this overload
+
 // jQuery.fn.offset = function() {
 // 	var left = 0, top = 0, elem = this[0], results;
 	
