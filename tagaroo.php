@@ -3,7 +3,7 @@
 Plugin Name: tagaroo
 Plugin URI: http://tagaroo.opencalais.com
 Description: Find and suggest tags and photos (from Flickr) for your content. Integrates with the Calais service.
-Version: 1.4.5
+Version: 1.4.6
 Author: Crowd Favorite and Reuters
 Author URI: http://crowdfavorite.com
 */
