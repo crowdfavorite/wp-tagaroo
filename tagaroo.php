@@ -313,8 +313,8 @@ function oc_request_handler() {
 				}
 				else {
 					if (isset($result['headers']) && gettype($result['headers']) == 'array') {
-						foreach ($result['headers'] as $response_header) {
-							header($response_header);
+						foreach ($result['headers'] as $header_key => $header_value) {
+							header($header_key.': '.$header_value);
 						}
 					}
 					echo $result['content'];
