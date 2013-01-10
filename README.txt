@@ -2,8 +2,8 @@
 Tags: tag, tags, tagging, semantic data, photo, photos, pictures, Flickr, calais
 Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
-Tested up to: 3.4.1
-Stable tag: 1.4.6
+Tested up to: 3.5
+Stable tag: 1.4.7
 
 Use tagaroo to get semantic data to use as tags and photo for your posts.
 
@@ -11,7 +11,7 @@ Use tagaroo to get semantic data to use as tags and photo for your posts.
 
 Tagaroo gives you an integration between your WordPress blog and the Calais web service. Tagaroo fetches semantic data (people, places, events, etc.) relevant to your blog post that you can use as tags. Tagaroo will also use these tags to search Flickr for appropriately licensed images for you to use in your blog posts.
 
-== Installation == 
+== Installation ==
 
 1. Download the plugin archive and expand it (you've likely already done this).
 2. Upload the tagaroo directory to your wp-content/plugins directory.
@@ -34,6 +34,10 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 
 == Changelog ==
 
+= 1.4.7 =
+
+* Fixed conflict with latest jQuery version shipped with WordPress 3.5
+
 = 1.4.6 =
 
 * Fixed bug with the setting of response headers in flickr api proxy
@@ -48,7 +52,7 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 * Replaced the class-snoopy calls with wp_remote_post().
 * Tested compatibility up to WordPress 3.3.
 
-= 1.4.3 = 
+= 1.4.3 =
 
 * JavaScript fix.
 
@@ -66,9 +70,9 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 
 = 1.3 =
 
-Tagaroo 1.3 will now identify 50 event types (up from 33 in the last version). We have made minor changes to the suggested tag names for some events. 
+Tagaroo 1.3 will now identify 50 event types (up from 33 in the last version). We have made minor changes to the suggested tag names for some events.
 
-New names are 
+New names are
 
 - More descriptive/real world, for example 'Business Relationship' instead of 'Alliance'
 - Unify some of the old ones, for example now we will have 'M&A' for 'Acquisition' and 'Merger' or 'Judicial Event' for 'Indictment', 'Trial' and 'Arrest'.
@@ -81,7 +85,7 @@ The WordPress auto-save feature does not save all tagaroo tag data, be sure to u
 
 == FAQ ==
 
-= Is this compatible with WordPress 2.2 or earlier? = 
+= Is this compatible with WordPress 2.2 or earlier? =
 
 No, tagaroo integrates with the native tagging feature of WordPress that was added in WordPress 2.3.
 
