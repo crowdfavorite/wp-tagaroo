@@ -4,6 +4,8 @@ Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
 Tested up to: 3.5
 Stable tag: 1.4.7
+License: GPLv2
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Use tagaroo to get semantic data to use as tags and photo for your posts.
 

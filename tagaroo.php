@@ -6,6 +6,7 @@ Description: Find and suggest tags and photos (from Flickr) for your content. In
 Version: 1.4.7
 Author: Crowd Favorite and Reuters
 Author URI: http://crowdfavorite.com
+License: GPL2
 */
 
 define('OC_WP_GTE_23', version_compare($wp_version, '2.3', '>='));
