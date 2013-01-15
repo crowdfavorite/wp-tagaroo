@@ -22,6 +22,12 @@ Tagaroo gives you an integration between your WordPress blog and the Calais web 
 5. Enter your API key, set your preferences for allowing your content to be indexed or not, and press the Update tagaroo Options button.
 6. Congratulations, you've just installed tagaroo!
 
+== Upgrade Notice ==
+
+WordPress 3.5 compatibility upgrade.
+
+WordPress 3.5 packages an updated version of jQuery (1.8.x) that drops support for a function we were using.  This breaks tagaroo's functionality.
+
 == Usage ==
 
 When writing blog posts, click the "Suggest Tags" link at any time to fetch appropriate tags and photos for the post.
@@ -85,7 +91,7 @@ Old posts tagged with previous names will not be affected at all with this chang
 
 The WordPress auto-save feature does not save all tagaroo tag data, be sure to use the Save/Publish button to make sure all of the tagaroo meta data is saved properly.
 
-== FAQ ==
+== Frequently Asked Questions ==
 
 = Is this compatible with WordPress 2.2 or earlier? =
 
