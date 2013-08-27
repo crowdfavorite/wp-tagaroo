@@ -216,16 +216,6 @@ if(jQuery) {
 		}		
 	})
 	
-	//Converts Text to XML DOM
-	jQuery.extend({
-		textToXML: function(strXML) {
-			var out;
-			try {
-				out = $.parseXML(strXML);
-			} catch(e) { throw new Error("Error parsing XML string"); }
-			return out;
-		}
-	})	
 } else {
 	alert("jQuery library is not present");	
 }
