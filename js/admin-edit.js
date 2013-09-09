@@ -105,7 +105,7 @@ oc.handleCalaisResponse = function(responseString) {
 		}
 	}
 	try {
-		oc.lastResponse = jQuery.xmlToJSON(jQuery.textToXML(responseString));
+		oc.lastResponse = jQuery.xmlToJSON(jQuery.parseXML(responseString));
 	}
 	catch (error) {
 		//console.error(error);

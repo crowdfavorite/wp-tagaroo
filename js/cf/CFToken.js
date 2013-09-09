@@ -52,7 +52,6 @@ var CFToken = CFBase.extend({
 		var html = this.getInlineHTML();
 		eval('jQuery(relativeTo).' + jQueryManip + '(html);');
 		jQuery('body').append(this.getOverlayHTML());
-
 		this.wasInsertedIntoDOM();
 	},
 	
@@ -74,8 +73,9 @@ var CFToken = CFBase.extend({
 		this.jqInline = jQuery('#cf_token_inline_' + this.id_tag);
 		this.jqOverlay = jQuery('#cf_token_overlay_' + this.id_tag);
 		var poppet = this;
-		this.jqInline.hover(function() { poppet.inlineHoverStart() }, function() { poppet.inlineHoverEnd() });
-		this.jqOverlay.hover(function() { poppet.overlayHoverStart() }, function() { poppet.overlayHoverEnd() });
+		this.jqInline.on('mouseenter', function(e) { poppet.inlineHoverStart(); });
+		this.jqOverlay.on('mouseenter', function(e) { poppet.overlayHoverStart(); });
+		this.jqOverlay.on('mouseleave', function(e) { poppet.overlayHoverEnd(); poppet.inlineHoverEnd(); });
 		this.isInDOM = true;
 	},
 	willBeRemovedFromDOM: function() {},
@@ -99,12 +99,10 @@ var CFToken = CFBase.extend({
 		ddlog('inlineHoverEnd');
 		var poppet = this;
 		if (this.showingOverlay) {
-			setTimeout(function() {
-				if (poppet.overlayWaitingForHover) {
-					poppet.hideOverlay();
-				}
-				poppet.overlayWaitingForHover = false;			
-			}, 10);
+			if (poppet.overlayWaitingForHover) {
+				poppet.hideOverlay();
+			}
+			poppet.overlayWaitingForHover = false;
 		}
 		this.jqInline.unbind('click', this._inlineClickHandler);
 		this.jqInline.unbind('dblclick', this._inlineDoubleClickHandler);
