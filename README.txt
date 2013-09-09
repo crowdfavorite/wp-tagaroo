@@ -2,8 +2,8 @@
 Tags: tag, tags, tagging, semantic data, photo, photos, pictures, Flickr, calais
 Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
-Tested up to: 3.5
-Stable tag: 1.4.7
+Tested up to: 3.6
+Stable tag: 1.4.8
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,10 @@ You can also drag tags up to the Tagaroo images list and Tagaroo will search Fli
 Clicking on a photo will show you a larger preview of the photo, and you can choose the size of the photo you want to add to your post.
 
 == Changelog ==
+
+= 1.4.8 =
+
+* Include better compatibility for older versions of IE
 
 = 1.4.7 =
 
