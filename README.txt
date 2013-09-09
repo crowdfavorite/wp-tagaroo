@@ -2,8 +2,8 @@
 Tags: tag, tags, tagging, semantic data, photo, photos, pictures, Flickr, calais
 Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
-Tested up to: 3.5
-Stable tag: 1.4.7
+Tested up to: 3.6
+Stable tag: 1.4.8
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,9 +42,9 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 
 == Changelog ==
 
-= develop =
+= 1.4.8 =
 
-* Fix compatibility issues with older versions of IE
+* Include better compatibility for older versions of IE
 
 = 1.4.7 =
 
