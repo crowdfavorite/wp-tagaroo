@@ -42,6 +42,10 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 
 == Changelog ==
 
+= develop =
+
+* Fix compatibility issues with older versions of IE
+
 = 1.4.7 =
 
 * Fixed conflict with latest jQuery version shipped with WordPress 3.5
