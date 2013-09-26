@@ -849,9 +849,12 @@ function oc_admin_head() {
 	<link type="text/css" href="' . OC_HTTP_PATH . '/css/ie6.css" rel="stylesheet" />
 	<![endif]-->
 	');
-		if ( OC_WP_GTE_27 ) {
-			add_meta_box( 'oc_tag_controls', 'tagaroo Tags', 'oc_render_tag_controls', 'post', 'normal', 'high' );
-			add_meta_box( 'oc_image_controls', 'tagaroo Images', 'oc_render_image_controls', 'post', 'normal', 'high' );
+		if (OC_WP_GTE_27) {
+			$tagaroo_post_types = apply_filters('oc_tagaroo_post_types', array('post'));
+			foreach ($tagaroo_post_types as $post_type) {
+				add_meta_box('oc_tag_controls', 'tagaroo Tags', 'oc_render_tag_controls', $post_type, 'normal', 'high');
+				add_meta_box('oc_image_controls', 'tagaroo Images', 'oc_render_image_controls', $post_type, 'normal', 'high');
+			}
 		}
 	}
 }
