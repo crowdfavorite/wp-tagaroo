@@ -47,6 +47,10 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 * Upgrade enpoints to use the new OpenCalais API
 * Implement PermID Company tags and their display on the frontend.
 
+= 1.4.9 (develop branch) =
+
+* Add filter to support multiple post types for the tagaroo meta boxes
+
 = 1.4.8 =
 
 * Include better compatibility for older versions of IE
