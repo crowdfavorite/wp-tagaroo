@@ -119,44 +119,45 @@ function oc_ping_oc_api($content, $content_status = OC_DRAFT_CONTENT, $paramsXML
 	return $response;
 }
 
-function oc_do_ping_oc_api($key, $content, $paramsXML) {
-	if (!isset($_POST['publish']) && !isset($_POST['save'])) {
-		$result = wp_remote_post('http://api.opencalais.com/enlighten/rest/', array(
+function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
+	if ( ! isset( $_POST['publish'] ) && ! isset( $_POST['save'] ) ) {
+		$result = wp_remote_post('https://api.thomsonreuters.com/permid/calais', array(
+			'headers' => array(
+				'x-ag-access-token' => $key,
+				'Content-Type' => 'text/xml',
+				'outputFormat' => 'application/json',
+			),
 			'body' => array(
-				'licenseID' => $key,
 				'content' => $content,
 				'paramsXML' => $paramsXML,
 			),
 		));
 
-		if (!is_wp_error($result) and isset($result['body'])) {
-			if (strpos($result['body'], 'Invalid request format - the request has missing or invalid parameters') !== false) {
+
+
+		if ( ! is_wp_error( $result ) && isset( $result['body'] ) && isset( $result['response']['code'] ) ) {
+			$result_code = $result['response']['code'];
+			$result_body = json_decode( $result['body'] );
+
+			if ( isset( $result_body['fault'] ) ) {
 				return array(
 					'success' => false,
 					'error' => 'API Key Invalid.',
 					'errortype' => 1
 				);
 			}
-			$matches = array();
-			$error_match = preg_match('/<Error Method="ProcessText"(.*?)><Exception>([^<]*)<\/Exception><\/Error>/', html_entity_decode($result['body']), $matches);
-			if ($error_match) {
+			if ( 200 == $result_code ) {
 				return array(
-					'success' => false,
-					'error' => $matches[2],
-					'errortype' => 2
+					'success' => true,
+					'content' => $result_body,
+					'errortype' => 0
 				);
 			}
-			//@file_put_contents(dirname(__FILE__).'/output.txt', $snoop->results);
-			return array(
-				'success' => true,
-				'content' => $result['body'],
-				'errortype' => 0
-			);
 		}
 		else {
 			return array(
 				'success' => false,
-				'error' => 'Could not contact OpenCalais: -- "'.print_r($result, true).'"',
+				'error' => 'Could not contact OpenCalais: -- " ' . print_r( $result, true ) . '"',
 				'errortype' => 3
 			);
 		}
@@ -614,7 +615,7 @@ function oc_get_css($which) {
 	display:none;
 }
 #oc_close_preview_button.loading {
-	background: url('.OC_HTTP_PATH.'/images/loading-black.gif) no-repeat;	
+	background: url('.OC_HTTP_PATH.'/images/loading-black.gif) no-repeat;
 }
 .right_textTokenButton {
 	display: block;
@@ -718,7 +719,7 @@ function oc_options_form() {
 	$api_msg = '';
 	if (!$oc_key_entered) {
 		$api_msg = '
-			<p>Like Akismet and a few other WordPress plugins the use of tagaroo requires that each user obtain a key for the service. 
+			<p>Like Akismet and a few other WordPress plugins the use of tagaroo requires that each user obtain a key for the service.
 			Tagaroo is built on top of the Calais service and getting a key is easy:</p>
 			<ul>
 				<li>Click <a href="http://opencalais.com/user/register">here</a> and follow the instructions for registering for an API key. Fill out the form and you’ll have your key in a few seconds.</li>
