@@ -32,7 +32,7 @@ oc.hideTagSearchingIndicator = function() {
 oc.pingCalais = function() {
 	var selection = oc.getSelectedPostText();
 	var text = selection.length ? selection : oc.getPostText();
-	
+
 	if (oc.docLangWorkaround && text.length <= 64 ) {
 		oc.tagManager.deleteUnusedSuggestedTags();
 		jQuery('#oc_api_notifications').html('tagaroo needs at least 64 characters to start searching for tags.').show();
@@ -44,8 +44,8 @@ oc.pingCalais = function() {
 		type: 'POST',
 		url: 'index.php',
 		dataType: 'text',
-		data: { 
-			oc_action: 'api_proxy_oc', 
+		data: {
+			oc_action: 'api_proxy_oc',
 			text: text
 		},
 		success: function(responseString) {
@@ -114,7 +114,7 @@ oc.handleCalaisResponse = function(responseString) {
 
 
 	if (oc.isValidResponse(oc.lastResponse) && oc.lastResponse.Description.length > 0) {
-		
+
 		jQuery('#oc_suggest_tags_link').show();
 
 		oc.tagManager.deleteUnusedSuggestedTags();
@@ -143,7 +143,7 @@ oc.handleCalaisResponse = function(responseString) {
 				}
 			}
 		});
-		
+
 		oc.tagManager.normalizeRelevance();
 
 		jQuery.each(newTags, function(i, tag) {
@@ -154,7 +154,7 @@ oc.handleCalaisResponse = function(responseString) {
 				oc.tagManager.putTagInBlacklist(tag, 'auto');
 			}
 		});
-		
+
 		if (oc.tagManager.suggestedTags.length == 0) {
 			jQuery('#oc_api_notifications').html('<span>No new tags extracted.<br/><a href="javascript:oc.pingCalais();">Suggest Tags</a></span>');
 		}
@@ -167,7 +167,7 @@ oc.handleCalaisResponse = function(responseString) {
 			}
 		}
 	}
-	
+
 };
 
 oc.isValidResponse = function(responseObject) {
@@ -378,7 +378,7 @@ oc.unarchiveSavedTags = function(wpTags) {
 					}
 				});
 			break;
-			
+
 		}
 	}
 };
@@ -421,7 +421,7 @@ oc.initPostEditPage = function() {
 		jQuery('#tagsdiv').remove();
 		jQuery('#oc_tag_controls div.inside').append('<input id="tags-input" type="hidden" value="" name="tags_input"/>');
 	}
-	
+
 	// set up buckets
 	oc.tagManager.suggestedBox = new oc.SuggestedTagBox();
 	oc.tagManager.currentBox = new oc.CurrentTagBox();
@@ -440,7 +440,7 @@ oc.initPostEditPage = function() {
 			if (tagName.length > 0) {
 				oc.tagManager.putTagInCurrent(oc.tagManager.createTagIfNew(tagName));
 			}
-		});		
+		});
 	}
 
 	jQuery('#oc_tag_controls').keypress(function(e) {
@@ -452,7 +452,7 @@ oc.initPostEditPage = function() {
 			return false;
 		}
 	});
-		
+
 	jQuery('#oc_add_tag_button').click(oc.addTagFieldHandler);
 	jQuery('#oc_add_tag_field').keypress(function(e) {
 		if (e.which == 13) {
@@ -462,13 +462,13 @@ oc.initPostEditPage = function() {
 		else {
 			jQuery('#oc_current_tag_notifications').html('&nbsp;');
 		}
-		
+
 	});
-	
+
 	var url = 'admin-ajax.php?action=ajax-tag-search';
-	var options = { 
-		delay: 500, 
-		minchars: 2, 
+	var options = {
+		delay: 500,
+		minchars: 2,
 		onSelect: oc.tagAutocompleteHandler
 	};
 
@@ -479,7 +479,7 @@ oc.initPostEditPage = function() {
 	}
 
 	jQuery('#oc_add_tag_field').suggest(url, options);
-	
+
 	// images
 	oc.imageManager.filmstripBox = new oc.ImageParadeBox();
 	oc.imageManager.filmstripBox.insertIntoDOM('append', jQuery('#oc_filmstrip_wrapper'));
