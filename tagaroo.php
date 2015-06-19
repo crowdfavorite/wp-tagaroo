@@ -170,7 +170,7 @@ function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 function oc_get_flickr_license_info() {
 	$info = get_option( 'oc_flickrLicenseInfo' );
 	if ( ! $info ) {
-		$result = wp_remote_post( 'http://api.flickr.com/services/rest', array(
+		$result = wp_remote_post( 'https://api.flickr.com/services/rest', array(
 			'body' => array(
 				'method' => 'flickr.photos.licenses.getInfo',
 				'api_key' => FLICKR_API_KEY,
@@ -331,6 +331,10 @@ function oc_request_handler() {
 				else {
 					if ( isset( $result['headers'] ) && gettype( $result['headers'] ) == 'array' ) {
 						foreach ( $result['headers'] as $header_key => $header_value ) {
+							// Yahoo API returns gziped encoding but data is not encoded as such
+							if ( 'content-encoding' == $header_key ) {
+								continue;
+							}
 							header( $header_key . ': ' . $header_value );
 						}
 					}
