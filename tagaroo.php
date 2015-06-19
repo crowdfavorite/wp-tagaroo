@@ -187,7 +187,8 @@ function oc_get_flickr_license_info() {
 }
 
 function oc_ping_flickr_api( $data ) {
-	$result = wp_remote_post( 'http://api.flickr.com/services/rest', array(
+
+	$result = wp_remote_post( 'https://api.flickr.com/services/rest', array(
 		'body' => array(
 			'method' => 'flickr.photos.search',
 			'api_key' => FLICKR_API_KEY,
@@ -201,8 +202,19 @@ function oc_ping_flickr_api( $data ) {
 			'nojsoncallback' => 1,
 		),
 	));
-	// to do: more error checking
+
 	if ( ! is_wp_error( $result ) && isset( $result['body'] ) ) {
+
+		// Check for additional errors returned by the API.
+		$json_body = json_decode( $result['body'] );
+		if ( ( isset( $json_body->stat ) && 'ok' != $json_body->stat  )
+			|| '200' != $result['response']['code'] ) {
+			return array(
+				'success' => false,
+				'error' => isset( $json_body->message ) ? $json_body->message : 'An unknown error has occured',
+			);
+		}
+
 		return array(
 			'success' => true,
 			'headers' => $result['headers'],
