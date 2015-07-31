@@ -4,6 +4,7 @@ oc.scanOnIdle = oc.autoFetch;
 oc.cachedPostContent = '<br>';
 oc.lastResponse = null;
 oc.docLangWorkaround = true;
+oc.tagTypes = {};
 
 if (typeof(console) == 'undefined') {
 	console = {log:function() {}, dir: function(){}};
@@ -15,6 +16,32 @@ if (typeof(console) == 'undefined') {
 oc.getFormatVersion = function() {
 	return '1.1';
 };
+
+oc.prepTagType = function(artifact) {
+	var type = artifact.type.name;
+	var tagdata = {};
+
+	if ( 'Company' === type ) {
+		// Dont store companies w/o permids
+		if ( undefined !== artifact.permID ) {
+			tagdata.name = artifact.name;
+			tagdata.commonName = artifact.commonName;
+			tagdata.permID = artifact.permID;
+			tagdata.ticker = artifact.ticker;
+		}
+	}
+	else {
+		tagdata.name = artifact.name;
+	}
+
+	if ( undefined === oc.tagTypes[type] ) {
+		oc.tagTypes[type] = [];
+	}
+
+	if ( undefined !== tagdata.name ) {
+		oc.tagTypes[type].push(tagdata);
+	}
+}
 
 oc.showTagSearchingIndicator = function() {
 	if (oc.postHasSelection()) {
@@ -94,6 +121,7 @@ oc.hideWorkingIndicator = function(responseString) {
 
 
 oc.handleCalaisResponse = function(responseString) {
+
 	if (responseString.indexOf('__oc_request_failed__') >= 0) {
 		eval('var errorObject = ' + responseString.substring('__oc_request_failed__'.length));
 		if (!oc.docLangWorkaround || (errorObject.error.indexOf('Unsupported document language') == -1)) {
@@ -120,11 +148,13 @@ oc.handleCalaisResponse = function(responseString) {
 		oc.tagManager.deleteUnusedSuggestedTags();
 
 		var artifacts = oc.artifactManager.generateArtifacts(oc.lastResponse.Description);
-
 		var newTags = [];
+
 
 		jQuery.each(artifacts, function(i, artifact) {
 			if (artifact.shouldGenerateTag()) {
+				// Pret tag data for storage
+				oc.prepTagType(artifact);
 				var resolvedArtifact = artifact;
 				if (artifact.isAmbiguous()) {
 					resolvedArtifact = oc.artifactManager.resolveAmbiguousEntity(artifact);
@@ -143,6 +173,7 @@ oc.handleCalaisResponse = function(responseString) {
 				}
 			}
 		});
+		jQuery('#oc_tag_data').val(JSON.stringify(oc.tagTypes));
 
 		oc.tagManager.normalizeRelevance();
 

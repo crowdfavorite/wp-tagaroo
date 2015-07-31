@@ -128,9 +128,8 @@ function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 				'Content-Type' => 'text/xml',
 				'outputFormat' => 'xml/rdf',
 			),
-			'body' => $content,
+			'body' => '<body>'.$content.'</body>',
 		) );
-
 		if ( ! is_wp_error( $result ) && isset( $result['body'] ) && isset( $result['response']['code'] ) ) {
 
 			// Requested xml/rdf, but errors come back as json encoded it appears as of Jun 17 2015
@@ -481,11 +480,13 @@ function oc_render_tag_controls() {
 		<a href="#" id="oc_suggest_tags_link">Suggest Tags</a>
 	' );
 	$meta = get_post_meta( $post->ID, 'oc_metadata', true );
+	$tag_meta_data = get_post_meta( $post->ID, 'oc_tag_data', true );
 	print( '
 		' . oc_get_control_wrapper( 'head', 'oc_tag_controls', 'tagaroo Tags' . $status_in_header ) . '
 				<div class="oc_tag_notification" id="oc_api_notifications"></div>
 				' . $status_in_controls . '
 				<textarea id="oc_metadata" type="hidden" name="oc_metadata">' . $meta . '</textarea>
+				<textarea id="oc_tag_data" type="hidden" name="oc_tag_data">' . $tag_meta_data . '</textarea>
 				<input id="newtag" type="hidden" value=""/>
 
 				<div id="oc_suggested_tags_wrapper">
@@ -539,6 +540,8 @@ function oc_render_image_controls() {
 			' . oc_get_control_wrapper( 'foot' ) . '
 	');
 }
+
+
 
 function oc_open_dbx_group() {
 	print( '<div class="dbx-group" id="oc-dbx">' );
@@ -627,7 +630,8 @@ function oc_get_css( $which ) {
 	right: 5px;
 	cursor: pointer;
 }
-#oc_metadata {
+#oc_metadata,
+#oc_tag_data {
 	display:none;
 }
 #oc_close_preview_button.loading {
@@ -913,16 +917,102 @@ function oc_save_post( $post_id, $post ) {
 		$result = oc_ping_oc_api( $post->post_content, OC_FINAL_CONTENT, $params );
 	}
 	if ( isset( $_POST['oc_metadata'] ) ) {
-		$metadata = get_post_meta( $post_id, 'oc_metadata', true );
-		if ( ! $metadata ) {
-			$r = add_post_meta( $post_id, 'oc_metadata', stripslashes( $_POST['oc_metadata'] ) );
-		}
-		else {
-			$r = update_post_meta( $post_id, 'oc_metadata', stripslashes( $_POST['oc_metadata'] ) );
-		}
+		update_post_meta( $post_id, 'oc_metadata', stripslashes( $_POST['oc_metadata'] ) );
 	}
+	if ( isset( $_POST['oc_tag_data'] ) ) {
+		// Possibly want to add to the existing data in case the post changes and new tags are supplied?
+		update_post_meta( $post_id, 'oc_tag_data', stripslashes( $_POST['oc_tag_data'] ) );
+	}
+
 }
 add_action( 'save_post', 'oc_save_post', 10, 2 );
 
+function oc_filter_content_permid( $content ) {
+	include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
+	global $post;
+	$footer_markup = false;
+	$preg_pattern = false;
 
-?>
+	if ( is_single() && 'post' == $post->post_type ) {
+		$tag_data = json_decode( get_post_meta( $post->ID, 'oc_tag_data', true ) );
+
+		if ( !empty( $tag_data )  && isset( $tag_data->Company ) ) {
+
+			$footer_markup = '<ul>';
+			// Also needs to be a tag attached to the post
+			$post_tag_names = oc_tag_names_filter( $post->ID );
+			$replacements = array();
+
+			foreach ( $tag_data->Company as $company_data ) {
+				$link_start = '<a href="' . esc_url( $permid_url ) . '">';
+				$link_end = '<i style="padding-left:5px;" class="fa fa-external-link"></i></a>';
+
+				// Only parse companies that have been added
+				if ( in_array( $company_data->name, $post_tag_names ) ) {
+					// Order matters here, commonname is likely to be contained within the name and be shorter
+					$preg_pattern .= preg_quote( $company_data->name ) . '|' . preg_quote( $company_data->ticker ) . '|' . preg_quote( $company_data->commonName ) . '|' ;
+
+					$permid_url = 'https://permid.org/1-' . $company_data->permID;
+					$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
+				}
+			}
+
+			$footer_markup .= '</ul>';
+		}
+	}
+
+
+	// Make sure that a tags are not being inserted into other a tags
+	if ( ! empty( $preg_pattern ) ) {
+		$html = str_get_html($content);
+		foreach ($html->find("text") as $element) {
+			// Get rid of final |
+			$preg_pattern = trim( $preg_pattern, '|' );
+			if ( ! oc_parent_has_a_tag( $element ) ) {
+				$element->innertext = preg_replace( '/\b(' . $preg_pattern . ')\b/i', '$1' . $link_start . $link_end, $element->innertext );
+			}
+		}
+		$content = $html;
+	}
+
+	if ( ! empty ( $footer_markup ) ) {
+		$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<hr />';
+	}
+
+	return $content;
+
+}
+add_filter( 'the_content', 'oc_filter_content_permid' );
+
+function oc_tag_names_filter( $post_id ) {
+	$tags = wp_get_post_tags( $post_id );
+	$tag_names = array();
+	foreach ($tags as $tag_data) {
+		$tag_names[] = $tag_data->name;
+	}
+
+	return $tag_names;
+}
+
+
+function oc_parent_has_a_tag( $element ) {
+	$has_a = false;
+	while ( isset( $element->parent ) ) {
+		$parent = $element->parent;
+		if ( 'a' == $parent->tag ) {
+			$has_a = true;
+			break;
+		}
+		$element = $parent;
+	}
+
+	return $has_a;
+}
+
+
+// Frontend enqueue
+function oc_enqueue_scripts() {
+	$plugin_dir_url = plugin_dir_url( __FILE__ );
+	wp_enqueue_style( 'font-awesome', $plugin_dir_url . 'vendor/font-awesome/css/font-awesome.min.css' );
+}
+add_action( 'wp_enqueue_scripts', 'oc_enqueue_scripts' );
