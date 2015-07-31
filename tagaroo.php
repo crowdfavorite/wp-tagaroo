@@ -1026,7 +1026,7 @@ function oc_frontent_style() {
 }
 .oc-trlogo {
 	float: right;
-	height: 30px;
+	height: auto;
 	padding: 0 10px 10px 0;
 	width: 113px;
 }
