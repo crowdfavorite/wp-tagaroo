@@ -938,7 +938,7 @@ function oc_filter_content_permid( $content ) {
 
 		if ( !empty( $tag_data )  && isset( $tag_data->Company ) ) {
 
-			$footer_markup = '<ul>';
+
 			// Also needs to be a tag attached to the post
 			$post_tag_names = oc_tag_names_filter( $post->ID );
 			$replacements = array();
@@ -956,7 +956,9 @@ function oc_filter_content_permid( $content ) {
 				}
 			}
 
-			$footer_markup .= '</ul>';
+			if ( ! empty( $footer_markup ) ) {
+				$footer_markup = '<ul>' . $footer_markup . '</ul>';
+			}
 		}
 	}
 
