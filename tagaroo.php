@@ -944,6 +944,7 @@ function oc_filter_content_permid( $content ) {
 			$replacements = array();
 
 			foreach ( $tag_data->Company as $company_data ) {
+				$permid_url = 'https://permid.org/1-' . $company_data->permID;
 				$link_start = '<a href="' . esc_url( $permid_url ) . '">';
 				$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
 
@@ -951,8 +952,6 @@ function oc_filter_content_permid( $content ) {
 				if ( in_array( $company_data->name, $post_tag_names ) ) {
 					// Order matters here, commonname is likely to be contained within the name and be shorter
 					$preg_pattern .= preg_quote( $company_data->name ) . '|' . preg_quote( $company_data->ticker ) . '|' . preg_quote( $company_data->commonName ) . '|' ;
-
-					$permid_url = 'https://permid.org/1-' . $company_data->permID;
 					$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
 				}
 			}
