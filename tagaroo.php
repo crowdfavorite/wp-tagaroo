@@ -945,7 +945,7 @@ function oc_filter_content_permid( $content ) {
 
 			foreach ( $tag_data->Company as $company_data ) {
 				$link_start = '<a href="' . esc_url( $permid_url ) . '">';
-				$link_end = '<i style="padding-left:5px;" class="fa fa-external-link"></i></a>';
+				$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
 
 				// Only parse companies that have been added
 				if ( in_array( $company_data->name, $post_tag_names ) ) {
@@ -976,7 +976,7 @@ function oc_filter_content_permid( $content ) {
 	}
 
 	if ( ! empty ( $footer_markup ) ) {
-		$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<hr />';
+		$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<img class="oc-trlogo" src="' . esc_url( plugin_dir_url( __FILE__ ) . 'images/tr-logo.png' ) . '" /><hr class="oc-hr" />';
 	}
 
 	return $content;
@@ -1016,3 +1016,23 @@ function oc_enqueue_scripts() {
 	wp_enqueue_style( 'font-awesome', $plugin_dir_url . 'vendor/font-awesome/css/font-awesome.min.css' );
 }
 add_action( 'wp_enqueue_scripts', 'oc_enqueue_scripts' );
+
+function oc_frontent_style() {
+?>
+<style type="text/css">
+.oc-external-link {
+	padding-left: 5px;
+}
+.oc-trlogo {
+	float: right;
+	height: 30px;
+	padding: 0 10px 10px 0;
+	width: 113px;
+}
+.oc-hr {
+	clear: both;
+}
+</style>
+<?php
+}
+add_action( 'wp_head', 'oc_frontent_style' );
