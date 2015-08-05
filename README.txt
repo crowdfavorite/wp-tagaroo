@@ -2,8 +2,8 @@
 Tags: tag, tags, tagging, semantic data, photo, photos, pictures, Flickr, calais
 Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
-Tested up to: 3.6
-Stable tag: 1.4.8
+Tested up to: 4.2
+Stable tag: 1.5.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ Use tagaroo to get semantic data to use as tags and photo for your posts.
 
 == Description ==
 
-Tagaroo gives you an integration between your WordPress blog and the Calais web service. Tagaroo fetches semantic data (people, places, events, etc.) relevant to your blog post that you can use as tags. Tagaroo will also use these tags to search Flickr for appropriately licensed images for you to use in your blog posts.
+Tagaroo gives you an integration between your WordPress blog and the Calais web service. Tagaroo fetches semantic data (people, places, events, etc.) relevant to your blog post that you can use as tags. Tagaroo will also use these tags to search Flickr for appropriately licensed images for you to use in your blog posts. Introduced in version 1.5 are Company PermID tags. These tags are denoted by an orange stripe, or can be filtered via the dropdown menu in the tag suggestion box. Company tags found within the content of a post will automatically link to their PermID page which includes company information.
 
 == Installation ==
 
@@ -41,6 +41,11 @@ You can also drag tags up to the Tagaroo images list and Tagaroo will search Fli
 Clicking on a photo will show you a larger preview of the photo, and you can choose the size of the photo you want to add to your post.
 
 == Changelog ==
+
+= 1.5.0 =
+
+* Upgrade enpoints to use the new OpenCalais API
+* Implement PermID Company tags and their display on the frontend.
 
 = 1.4.8 =
 
