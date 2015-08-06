@@ -8,25 +8,25 @@
 oc.TagManager = CFBase.extend({
 	init: function() {
 	},
-	
+
 	// have a slug? need a tag? come here. i give you best deal.
 	tagForSlug: function(slug) {
 		return this.tagSlugMap[slug];
 	},
-	
+
 	// tags register themselves upon creation/rehydration. no need to do it manually.
 	registerTag: function(tag) {
 		this.tagSlugMap[tag.slug] = tag;
 	},
-	
+
 	// tags will unregister themselves when their delete method is called
-	// which, since js doesn't have automatic destructors, you *may* need to do by hand. 
+	// which, since js doesn't have automatic destructors, you *may* need to do by hand.
 	// but for most cases, calling tagManager.deleteTag(tag) is the way to go.
 	unregisterTag: function(tag) {
 		this._removeTagFromBuckets(tag);
 		delete this.tagSlugMap[tag.slug];// = undefined;
 	},
-	
+
 	_removeTagFromBuckets: function(tag) {
 		switch(tag.bucketName) {
 			case 'suggested':
@@ -52,7 +52,7 @@ oc.TagManager = CFBase.extend({
 		}
 		tag._setBucketName('none');
 	},
-	
+
 	deleteUnusedSuggestedTags: function() {
 		var poppet = this;
 		jQuery.each(this.tagSlugMap, function(slug, tag) {
@@ -64,13 +64,13 @@ oc.TagManager = CFBase.extend({
 			}
 		});
 	},
-	
+
 	updateSuggestedBox: function() {
 		if (!this.deferUpdates) {
 			this.suggestedBox.removeTokens();
 			var poppet = this;
-			this.suggestedBox.addTokens(jQuery.map(this.suggestedTags, function(tag) { 
-				return (poppet.suggestedFilter == 'All' || tag.source.getTagTypeName() == poppet.suggestedFilter) ? tag.textToken : null; 
+			this.suggestedBox.addTokens(jQuery.map(this.suggestedTags, function(tag) {
+				return (poppet.suggestedFilter == 'All' || tag.source.getTagTypeName() == poppet.suggestedFilter) ? tag.textToken : null;
 			}));
 			/*
 			jQuery.each(this.suggestedTags, function(i, tag) {
@@ -82,7 +82,7 @@ oc.TagManager = CFBase.extend({
 		}
 		else {
 			this._addUpdateMethod(this.updateSuggestedBox);
-		}		
+		}
 	},
 	updateCurrentBox: function() {
 		if (!this.deferUpdates) {
@@ -97,7 +97,7 @@ oc.TagManager = CFBase.extend({
 		}
 		else {
 			this._addUpdateMethod(this.updateCurrentBox);
-		}		
+		}
 	},
 	updateBlacklistedBox: function() {
 		if (!this.deferUpdates) {
@@ -112,18 +112,18 @@ oc.TagManager = CFBase.extend({
 		}
 		else {
 			this._addUpdateMethod(this.updateBlacklistedBox);
-		}		
+		}
 	},
-	
+
 	updateBoxes: function() {
-		// methods list is a fifo. order of invocation is important. 
+		// methods list is a fifo. order of invocation is important.
 		// the suggested box, for example, depends on the filter list being updated first.
 		this._addUpdateMethod(this.updateFilterList);
 		this._addUpdateMethod(this.updateBlacklistedBox);
 		this._addUpdateMethod(this.updateSuggestedBox);
 		this._addUpdateMethod(this.updateCurrentBox);
 	},
-	
+
 	// defer all UI updates until we drop to idle, then do it once
 	_addUpdateMethod: function(method) {
 		// if deferUpdates is off, we're in the middle of invoking deferred updates.
@@ -131,25 +131,25 @@ oc.TagManager = CFBase.extend({
 		if (!this.deferUpdates) {
 			return;
 		}
-		
-		// we currently may need to run the same method twice at different times. 
+
+		// we currently may need to run the same method twice at different times.
 		// but it's safe to not make several calls to the same method in a row.
 		if (this.updateMethods[this.updateMethods.length - 1] != method) {
 			this.updateMethods.push(method);
 		}
-		
+
 		if (!this.updateTimerRef) {
 			var poppet = this;
 			this.updateTimerRef = setTimeout(function() { poppet._invokeUpdates(); }, 0);
 		}
 	},
-	
+
 	_invokeUpdates: function() {
 		var poppet = this;
 		var methods = this.updateMethods;
 		var nMethods = methods.length;
 		this.updateMethods = [];
-				
+
 		this.deferUpdates = false;
 		// kinda dumb optimization
 		if (nMethods > 6) {
@@ -166,14 +166,14 @@ oc.TagManager = CFBase.extend({
 			}
 		}
 		this.deferUpdates = true;
-		
+
 		oc.updateArchiveField();	// for now, just always call it
 		if (this.updateTimerRef) {
 			clearTimeout(this.updateTimerRef);
 			this.updateTimerRef = 0;
 		}
 	},
-	
+
 	putTagInSuggested: function(tag, placement) {
 		if (tag) {
 			this._removeTagFromBuckets(tag);
@@ -183,7 +183,7 @@ oc.TagManager = CFBase.extend({
 			this.updateBoxes();
 		}
 	},
-	
+
 	putTagInCurrent: function(tag, placement) {
 		if (tag) {
 			this._removeTagFromBuckets(tag);
@@ -193,7 +193,7 @@ oc.TagManager = CFBase.extend({
 			this.updateBoxes();
 		}
 	},
-	
+
 	putTagInBlacklist: function(tag, placement) {
 		if (tag) {
 			this._removeTagFromBuckets(tag);
@@ -203,7 +203,7 @@ oc.TagManager = CFBase.extend({
 			this.updateBoxes();
 		}
 	},
-	
+
 	putAllSuggestedInCurrent: function() {
 		var poppet = this;
 		jQuery.each(this.suggestedTags, function(i, tag) {
@@ -212,7 +212,7 @@ oc.TagManager = CFBase.extend({
 			}
 		});
 	},
-	
+
 	toggleSuggestedIgnoredBuckets: function() {
 		if (this.suggestedShowing) {
 			this.showIgnoredBucket();
@@ -221,21 +221,21 @@ oc.TagManager = CFBase.extend({
 			this.showSuggestedBucket();
 		}
 	},
-	
+
 	showSuggestedBucket: function() {
 		jQuery('#cf_tokenbox_suggested_tags').slideDown('fast');
 		jQuery('#oc_filter_tags_form').slideDown('fast');
 		jQuery('#cf_tokenbox_blacklisted_tags').slideUp('fast');
 		this.suggestedShowing = true;
 	},
-	
+
 	showIgnoredBucket: function() {
 		jQuery('#cf_tokenbox_suggested_tags').slideUp('fast');
 		jQuery('#oc_filter_tags_form').slideUp('fast');
 		jQuery('#cf_tokenbox_blacklisted_tags').slideDown('fast');
 		this.suggestedShowing = false;
 	},
-	
+
 	updateFilterList: function() {
 		if (!this.deferUpdates) {
 			if (this.shouldUpdateFilterList) {
@@ -276,18 +276,18 @@ oc.TagManager = CFBase.extend({
 			this._addUpdateMethod(this.updateFilterList);
 		}
 	},
-	
+
 	filterSuggestedByType: function(type) {
 		this.shouldUpdateFilterList = false;
 		this.suggestedFilter = type;
 		this.updateSuggestedBox();
-		this.shouldUpdateFilterList = true;		
+		this.shouldUpdateFilterList = true;
 	},
-	
+
 	tagsAsCSV: function(options) {
 		var poppet = this;
 		var tags = [];
-		
+
 		if (typeof(options) == 'string') {
 			options = {which: options};
 		}
@@ -318,7 +318,7 @@ oc.TagManager = CFBase.extend({
 						tags = jQuery.grep(tags, function(tag, i) { return tag.shouldUseForImageSearch(); });
 					break;
 				}
-			});			
+			});
 		}
 		return jQuery.map(tags, function(tag) { return tag.text; }).join();
 	},
@@ -337,12 +337,12 @@ oc.TagManager = CFBase.extend({
 		}
 		return null;
 	},
-	
+
 	// use this to remove all knowledge of a tag.
 	deleteTag: function(tag) {
 		tag.destruct();
 	},
-	
+
 	// todo: smarter serialization
 	getSerializedTags: function() {
 		var tagSerializations = [];
@@ -365,7 +365,7 @@ oc.TagManager = CFBase.extend({
 		result += '}';
 		return result;
 	},
-	
+
 	// normalizes across all current tags
 	normalizeRelevance: function() {
 		var max = 0;
@@ -380,8 +380,8 @@ oc.TagManager = CFBase.extend({
 			});
 		}
 	},
-	
-	// source of truth for all known tags; unless we're *really* done with a tag, it doesn't leave this object. 
+
+	// source of truth for all known tags; unless we're *really* done with a tag, it doesn't leave this object.
 	// maps from tag slug to tag object.
 	tagSlugMap: {},
 
@@ -399,13 +399,13 @@ oc.TagManager = CFBase.extend({
 	suggestedFilter: 'All',
 	suggestedShowing: true,
 	shouldUpdateFilterList: true,
-	
+
 	// when we do a bunch of moving of stuff around we mark the UI as needing an update
 	// and use a timer to hold off on actually updating until we fall back into the idle loop.
 	deferUpdates: true,
 	updateTimerRef: 0,
 	updateMethods: []
-	
+
 });
 
 // singleton
