@@ -780,7 +780,8 @@ function oc_options_form() {
 						<tr>
 							<th scope="row">Calais API Key</th>
 							<td>
-								<input type="text" size="24" name="oc_api_key" autocomplete="off" value="' . $oc_api_key . '" /><br/>' . $api_msg.$error . '
+								<input type="text" size="50" name="oc_api_key" autocomplete="off" value="' . $oc_api_key . '" /><br/>' . $api_msg.$error . '
+								<p><a href="http://new.opencalais.com/opencalais-api/" target="_blank">Get your OpenCalai API key</p>
 							</td>
 						</tr>
 					</tbody>
@@ -795,7 +796,7 @@ function oc_options_form() {
 								<label for="oc_privacy_searchable">Searched</label><br/>
 								<input id="oc_privacy_distribute" type="checkbox" name="oc_privacy_distribute" ' . $distribute_checked . ' />
 								<label for="oc_privacy_distribute">Distributed</label><br/>
-								<p><a href="http://opencalais.com/page/API_terms_of_use">Only public, published posts will be indexed by Calais</a></p>
+								<p><a href="http://new.opencalais.com/open-calais-terms-of-service/">Only public, published posts will be indexed by Calais</a></p>
 							</td>
 						</tr>
 					</tbody>
