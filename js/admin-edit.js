@@ -20,12 +20,11 @@ oc.getFormatVersion = function() {
 oc.prepTagType = function(artifact) {
 	var type = artifact.type.name;
 	var tagdata = {};
-
 	if ( 'Company' === type ) {
 		// Dont store companies w/o permids
 		if ( undefined !== artifact.permID ) {
 			tagdata.name = artifact.name;
-			tagdata.commonName = artifact.commonName;
+			tagdata.fullName = artifact.fullName;
 			tagdata.permID = artifact.permID;
 			tagdata.ticker = artifact.ticker;
 		}
@@ -149,7 +148,6 @@ oc.handleCalaisResponse = function(responseString) {
 
 		var artifacts = oc.artifactManager.generateArtifacts(oc.lastResponse.Description);
 		var newTags = [];
-
 
 		jQuery.each(artifacts, function(i, artifact) {
 			if (artifact.shouldGenerateTag()) {

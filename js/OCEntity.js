@@ -5,13 +5,14 @@ oc.Entity = oc.TagSource.extend({
 		this._super(rdfDescription);
 		this.url = rdfDescription['rdf:about'];
 		this.type = oc.artifactManager.createArtifactTypeIfNew(rdfDescription['type'][0]['rdf:resource']);
+
 		if ((this.type.name == 'City' || this.type.name == 'ProvinceOrState') && ('shortname' in rdfDescription)) {
 			this.name = rdfDescription.shortname[0].Text;
 		}
 		else if (this.type.name === 'Company' && undefined !== rdfDescription.commonname) {
-			this.name = rdfDescription.name[0].Text;
-			this.commonName = rdfDescription.commonname[0].Text;
-			this.ticker = rdfDescription.ticker[0].Text;
+			this.name = rdfDescription.commonname[0].Text;
+			this.fullName = rdfDescription.name[0].Text;
+			this.ticker = !! rdfDescription.ticker ? rdfDescription.ticker[0].Text : false;
 			this.permID = rdfDescription.permid[0].Text;
 		}
 		else {
