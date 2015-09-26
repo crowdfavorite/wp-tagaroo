@@ -120,7 +120,7 @@ oc.hideWorkingIndicator = function(responseString) {
 
 
 oc.handleCalaisResponse = function(responseString) {
-
+console.log(responseString);
 	if (responseString.indexOf('__oc_request_failed__') >= 0) {
 		eval('var errorObject = ' + responseString.substring('__oc_request_failed__'.length));
 		if (!oc.docLangWorkaround || (errorObject.error.indexOf('Unsupported document language') == -1)) {
@@ -135,7 +135,6 @@ oc.handleCalaisResponse = function(responseString) {
 		oc.lastResponse = jQuery.xmlToJSON(jQuery.parseXML(responseString));
 	}
 	catch (error) {
-		//console.error(error);
 		throw error;
 	}
 

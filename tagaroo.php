@@ -122,14 +122,16 @@ function oc_ping_oc_api( $content, $content_status = OC_DRAFT_CONTENT, $paramsXM
 
 function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 	if ( ! isset( $_POST['publish'] ) && ! isset( $_POST['save'] ) ) {
-		$result = wp_remote_post( 'https://api.thomsonreuters.com/permid/calais', array(
+		$result = wp_remote_post( 'https://api.thomsonreuters.com:443/permid/calais', array(
 			'headers' => array(
 				'x-ag-access-token' => $key,
 				'Content-Type' => 'text/xml',
 				'outputFormat' => 'xml/rdf',
 			),
-			'body' => '<body>'.$content.'</body>',
+			'body' => '<body>'.htmlspecialchars($content).'</body>',
 		) );
+
+		error_log(print_r($result,1));
 		if ( ! is_wp_error( $result ) && isset( $result['body'] ) && isset( $result['response']['code'] ) ) {
 
 			// Requested xml/rdf, but errors come back as json encoded it appears as of Jun 17 2015
@@ -931,46 +933,46 @@ function oc_save_post( $post_id, $post ) {
 }
 add_action( 'save_post', 'oc_save_post', 10, 2 );
 
-function oc_filter_content_permid( $content ) {
+function oc_filter_content( $content, $type ) {
 	include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
 	global $post;
 	$footer_markup = false;
 	$preg_pattern = false;
-
 	if ( is_single() && 'post' == $post->post_type ) {
 		$tag_data = json_decode( get_post_meta( $post->ID, 'oc_tag_data', true ) );
 
-		if ( !empty( $tag_data )  && isset( $tag_data->Company ) ) {
+		// Also needs to be a tag attached to the post
+		$post_tag_names = oc_tag_names_filter( $post->ID );
+		$replacements = array();
 
+		$tags = oc_filter_get_tags( $tag_data, $type );
 
+		if ( ! empty( $tags ) ) {
 			// Also needs to be a tag attached to the post
 			$post_tag_names = oc_tag_names_filter( $post->ID );
 			$replacements = array();
 
-			foreach ( $tag_data->Company as $company_data ) {
-				$permid_url = 'https://permid.org/1-' . $company_data->permID;
-				$link_start = '<a href="' . esc_url( $permid_url ) . '">';
-				$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
+			foreach ( $tags as $tag ) {
+				$url = oc_filter_get_url( $tag, $type );
+				if ( $url ) {
+					$link_start = '<a href="' . esc_url( $url ) . '">';
+					$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
 
-				// Only parse companies that have been added
-				if ( in_array( $company_data->name, $post_tag_names ) ) {
-					// Order matters here, commonname is likely to be contained within the name and be shorter
-					$preg_pattern .= preg_quote( $company_data->name ) . '|' . preg_quote( $company_data->ticker ) . '|' . preg_quote( $company_data->commonName ) . '|' ;
-					$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
+					// Only parse companies that have been added
+					if ( in_array( $tag->name, $post_tag_names ) ) {
+						// Order matters here, commonname is likely to be contained within the name and be shorter
+						$preg_pattern .= oc_filter_pattern( $tag, $type );
+						$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
+					}
 				}
-			}
-
-			if ( ! empty( $footer_markup ) ) {
-				$footer_markup = '<ul>' . $footer_markup . '</ul>';
 			}
 		}
 	}
 
-
 	// Make sure that a tags are not being inserted into other a tags
 	if ( ! empty( $preg_pattern ) ) {
-		$html = str_get_html($content);
-		foreach ($html->find("text") as $element) {
+		$html = str_get_html( $content );
+		foreach ( $html->find("text") as $element ) {
 			// Get rid of final |
 			$preg_pattern = trim( $preg_pattern, '|' );
 			if ( ! oc_parent_has_a_tag( $element ) ) {
@@ -985,7 +987,51 @@ function oc_filter_content_permid( $content ) {
 	}
 
 	return $content;
+}
 
+function oc_filter_get_tags( $tag_data, $type = 'Social' ) {
+	if ( empty ( $tag_data ) ) {
+		return array();
+	}
+	if ( $type == 'Company' ) {{
+		return isset( $tag_data->Company ) ? $tag_data->Company : array();
+	}
+
+	// Default to Social tags
+	return isset( $tag_data->Social ) ? $tag_data->Social : array();
+}
+
+function oc_filter_get_url( $tag, $type ) {
+	$url = false;
+	if ( 'Company' == $type ) {
+		$url = 'https://permid.org/1-' . $tag->permID;
+	}
+	else {
+		$url = 'https://wikipedia.org/' . $tag->name;
+	}
+
+	return $url;
+}
+
+function oc_filter_pattern( $tag, $type ) {
+	$pattern = preg_quote( $tag->name ) . '|';
+	if ( 'Company' == $type ) {
+	  $pattern .= isset( $tag->ticker ) ? preg_quote( $tag->ticker ) . '|' : '';
+	  $pattern .= isset( $tag->fullName ) ? preg_quote( $company_data->fullName ) . '|' : '';
+	}
+
+	return $pattern;
+}
+
+function oc_filter_content_social( $content ) {
+	return oc_filter_content( $content, 'social' );
+
+}
+add_filter( 'the_content', 'oc_filter_content_social' );
+}
+
+function oc_filter_content_permid( $content ) {
+	return oc_filter_content( $content, 'Company' );
 }
 add_filter( 'the_content', 'oc_filter_content_permid' );
 
