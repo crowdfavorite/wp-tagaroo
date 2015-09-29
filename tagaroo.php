@@ -120,6 +120,49 @@ function oc_ping_oc_api( $content, $content_status = OC_DRAFT_CONTENT, $paramsXM
 	return $response;
 }
 
+function oc_format_content( $content ) {
+	$block_tags = array(
+		'address',
+		'article',
+		'aside',
+		'blockquote',
+		'canvas',
+		'dd',
+		'div',
+		'dl',
+		'fieldset',
+		'figcaption',
+		'figure',
+		'footer',
+		'form',
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'header',
+		'hgroup',
+		'hr',
+		'main',
+		'nav',
+		'output',
+		'p',
+		'pre',
+		'section',
+		'table',
+		'tfoot',
+		'ul',
+		'video',
+		'li',
+		'br'
+	);
+	foreach ($block_tags as $block_tag) {
+		$content = str_ireplace(array( '<'.$block_tag, $block_tag.'>', $block_tag.' />', $block_tag.'/>'), array(' <'.$block_tag, $block_tag.'> ', $block_tag.' /> ', $block_tag.' /> '), $content);
+	}
+	return strip_tags($content);
+}
+
 function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 	if ( ! isset( $_POST['publish'] ) && ! isset( $_POST['save'] ) ) {
 		$result = wp_remote_post( 'https://api.thomsonreuters.com:443/permid/calais', array(
@@ -128,10 +171,9 @@ function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 				'Content-Type' => 'text/xml',
 				'outputFormat' => 'xml/rdf',
 			),
-			'body' => '<body>'.htmlspecialchars($content).'</body>',
+			'body' => '<body>'.oc_format_content($content).'</body>',
 		) );
 
-		error_log(print_r($result,1));
 		if ( ! is_wp_error( $result ) && isset( $result['body'] ) && isset( $result['response']['code'] ) ) {
 
 			// Requested xml/rdf, but errors come back as json encoded it appears as of Jun 17 2015
@@ -933,72 +975,78 @@ function oc_save_post( $post_id, $post ) {
 }
 add_action( 'save_post', 'oc_save_post', 10, 2 );
 
-function oc_filter_content( $content, $type ) {
+function oc_filter_content( $content ) {
 	include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
 	global $post;
 	$footer_markup = false;
-	$preg_pattern = false;
-	if ( is_single() && 'post' == $post->post_type ) {
-		$tag_data = json_decode( get_post_meta( $post->ID, 'oc_tag_data', true ) );
+	$types = array('Social', 'Company');
+	foreach ($types as $type) {
+		# code...
 
-		// Also needs to be a tag attached to the post
-		$post_tag_names = oc_tag_names_filter( $post->ID );
-		$replacements = array();
+		$preg_pattern = false;
+		if ( is_single() && 'post' == $post->post_type ) {
+			$tag_data = json_decode( get_post_meta( $post->ID, 'oc_tag_data', true ) );
 
-		$tags = oc_filter_get_tags( $tag_data, $type );
-
-		if ( ! empty( $tags ) ) {
 			// Also needs to be a tag attached to the post
 			$post_tag_names = oc_tag_names_filter( $post->ID );
 			$replacements = array();
 
-			foreach ( $tags as $tag ) {
-				$url = oc_filter_get_url( $tag, $type );
-				if ( $url ) {
-					$link_start = '<a href="' . esc_url( $url ) . '">';
-					$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
+			$tags = oc_filter_get_tags( $tag_data, $type );
 
-					// Only parse companies that have been added
-					if ( in_array( $tag->name, $post_tag_names ) ) {
-						// Order matters here, commonname is likely to be contained within the name and be shorter
-						$preg_pattern .= oc_filter_pattern( $tag, $type );
-						$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
+			if ( ! empty( $tags ) ) {
+				// Also needs to be a tag attached to the post
+				$post_tag_names = oc_tag_names_filter( $post->ID );
+				$replacements = array();
+
+				foreach ( $tags as $tag ) {
+					$url = oc_filter_get_url( $tag, $type );
+					if ( $url ) {
+						$link_start = '<a href="' . esc_url( $url ) . '">';
+						$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
+
+						// Only parse companies that have been added
+						if ( in_array( $tag->name, $post_tag_names ) ) {
+							// Order matters here, commonname is likely to be contained within the name and be shorter
+							$preg_pattern .= oc_filter_pattern( $tag, $type );
+							$footer_markup .= '<li>' . $link_start . esc_html( $tag->name ) . $link_end . '</li>';
+						}
 					}
 				}
 			}
 		}
-	}
 
-	// Make sure that a tags are not being inserted into other a tags
-	if ( ! empty( $preg_pattern ) ) {
-		$html = str_get_html( $content );
-		foreach ( $html->find("text") as $element ) {
-			// Get rid of final |
-			$preg_pattern = trim( $preg_pattern, '|' );
-			if ( ! oc_parent_has_a_tag( $element ) ) {
-				$element->innertext = preg_replace( '/\b(' . $preg_pattern . ')\b/i', '$1' . $link_start . $link_end, $element->innertext );
+		// Make sure that a tags are not being inserted into other a tags
+		if ( ! empty( $preg_pattern ) ) {
+			$html = str_get_html( $content );
+			foreach ( $html->find("text") as $element ) {
+				// Get rid of final |
+				$preg_pattern = trim( $preg_pattern, '|' );
+				if ( ! oc_parent_has_a_tag( $element ) ) {
+					$element->innertext = preg_replace( '/\b(' . $preg_pattern . ')\b/i', '$1' . $link_start . $link_end, $element->innertext );
+				}
 			}
+			$content = $html;
 		}
-		$content = $html;
-	}
 
+
+	}
 	if ( ! empty ( $footer_markup ) ) {
-		$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<img class="oc-trlogo" src="' . esc_url( plugin_dir_url( __FILE__ ) . 'images/tr-logo.png' ) . '" /><hr class="oc-hr" />';
+			$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<img class="oc-trlogo" src="' . esc_url( plugin_dir_url( __FILE__ ) . 'images/tr-logo.png' ) . '" /><hr class="oc-hr" />';
 	}
-
 	return $content;
 }
+add_filter( 'the_content', 'oc_filter_content' );
 
 function oc_filter_get_tags( $tag_data, $type = 'Social' ) {
 	if ( empty ( $tag_data ) ) {
 		return array();
 	}
-	if ( $type == 'Company' ) {{
+	if ( $type == 'Company' ) {
 		return isset( $tag_data->Company ) ? $tag_data->Company : array();
 	}
 
 	// Default to Social tags
-	return isset( $tag_data->Social ) ? $tag_data->Social : array();
+	return isset( $tag_data->SocialTag ) ? $tag_data->SocialTag : array();
 }
 
 function oc_filter_get_url( $tag, $type ) {
@@ -1007,7 +1055,7 @@ function oc_filter_get_url( $tag, $type ) {
 		$url = 'https://permid.org/1-' . $tag->permID;
 	}
 	else {
-		$url = 'https://wikipedia.org/' . $tag->name;
+		$url = 'https://en.wikipedia.org/w/index.php?title=' . $tag->name . '&redirect=yes';
 	}
 
 	return $url;
@@ -1016,24 +1064,12 @@ function oc_filter_get_url( $tag, $type ) {
 function oc_filter_pattern( $tag, $type ) {
 	$pattern = preg_quote( $tag->name ) . '|';
 	if ( 'Company' == $type ) {
-	  $pattern .= isset( $tag->ticker ) ? preg_quote( $tag->ticker ) . '|' : '';
-	  $pattern .= isset( $tag->fullName ) ? preg_quote( $company_data->fullName ) . '|' : '';
+	  $pattern .= ! empty( $tag->ticker ) ? preg_quote( $tag->ticker ) . '|' : '';
+	  $pattern .= ! empty( $tag->fullName ) ? preg_quote( $tag->fullName ) . '|' : '';
 	}
 
 	return $pattern;
 }
-
-function oc_filter_content_social( $content ) {
-	return oc_filter_content( $content, 'social' );
-
-}
-add_filter( 'the_content', 'oc_filter_content_social' );
-}
-
-function oc_filter_content_permid( $content ) {
-	return oc_filter_content( $content, 'Company' );
-}
-add_filter( 'the_content', 'oc_filter_content_permid' );
 
 function oc_tag_names_filter( $post_id ) {
 	$tags = wp_get_post_tags( $post_id );
