@@ -329,6 +329,21 @@ oc.TagManager = CFBase.extend({
 		text = text.replace(/,/g, ' ');
 		var slug = cf.slugify(text);
 		var existingTag = this.tagSlugMap[slug];
+
+		if ( ! source ) {
+			// loop through and if no source, see if wp tag exists
+			jQuery.each(this.tagSlugMap, function( tagSlug, tag ) {
+				if ( undefined !== tag.wpSlug  && tag.wpSlug == slug ) {
+					existingTag = tag;
+				}
+			});
+		}
+		else if ( typeof(existingTag) == 'undefined' ) {
+			slug = slug + source.type.name;
+			existingTag = this.tagSlugMap[slug];
+		}
+
+
 		if (typeof(existingTag) == 'undefined') {
 			return new oc.Tag(text, source);
 		}
