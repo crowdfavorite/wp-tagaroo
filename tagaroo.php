@@ -1040,8 +1040,8 @@ function oc_get_tags_on_post( $post_id ) {
 	if ( isset( $data->tags )  ) {
 		foreach ( $data->tags as $tag ) {
 
-			if ( 'current' == $tag->bucketName ) {
-				if ( isset( $tag->type ) && 'SocialTag' == $tag->type ) {
+			if ( isset( $tag->type ) && 'current' == $tag->bucketName ) {
+				if ( 'SocialTag' == $tag->type ) {
 					$tags['SocialTag'][] = array(
 						'name' => $tag->source->name,
 					);
