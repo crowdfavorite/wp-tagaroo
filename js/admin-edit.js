@@ -120,7 +120,6 @@ oc.hideWorkingIndicator = function(responseString) {
 
 
 oc.handleCalaisResponse = function(responseString) {
-console.log(responseString);
 	if (responseString.indexOf('__oc_request_failed__') >= 0) {
 		eval('var errorObject = ' + responseString.substring('__oc_request_failed__'.length));
 		if (!oc.docLangWorkaround || (errorObject.error.indexOf('Unsupported document language') == -1)) {
@@ -331,8 +330,8 @@ oc.tagAutocompleteHandler = function() {
 
 oc.updateArchiveField = function() {
 	var v = '{\
-		version:\'' + oc.getFormatVersion() + '\',\
-		tags: ' + oc.tagManager.getSerializedTags() + '\
+		"version":"' + oc.getFormatVersion() + '",\
+		"tags": ' + oc.tagManager.getSerializedTags() + '\
 	}';
 	jQuery('#tags-input').val(oc.tagManager.tagsAsCSV('current'));
 	jQuery('#oc_metadata').val(v);

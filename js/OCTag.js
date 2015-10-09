@@ -9,7 +9,17 @@ oc.Tag = CFBase.extend({
 		if ( !! source ) {
 			this.slug = this.slug + source.type.name
 			this.type = source.type.name;
+			if ( 'Company' === this.type ) {
+				// Dont store companies w/o permids
+				if ( undefined !== source.permID ) {
+					this.name = source.name;
+					this.fullName = source.fullName;
+					this.permID = source.permID;
+					this.ticker = source.ticker;
+				}
+			}
 		}
+
 		oc.tagManager.registerTag(this);
 		this.source = source || null;
 
@@ -76,7 +86,8 @@ oc.Tag = CFBase.extend({
 			bucketName: this.bucketName,
 			bucketPlacement: this.bucketPlacement,
 			_className: this._className,
-			wpSlug : this.wpSlug
+			wpSlug : this.wpSlug,
+			type: this.type
 		};
 	},
 

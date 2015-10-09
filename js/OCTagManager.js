@@ -366,11 +366,11 @@ oc.TagManager = CFBase.extend({
 			switch (tag.bucketName) {
 				case 'blacklisted':
 					if (tag.getBucketPlacement() == 'user') {
-						tagSerializations.push('\'' + slug + '\': ' + tag.serialize());
+						tagSerializations.push('"' + slug + '": ' + tag.serialize());
 					}
 				break;
 				case 'current':
-					tagSerializations.push('\'' + slug + '\': ' + tag.serialize());
+					tagSerializations.push('"' + slug + '": ' + tag.serialize());
 				break;
 				case 'suggested':
 				break;
