@@ -210,7 +210,7 @@ oc.TagToken = CFTextToken.extend({
 				return Number.MAX_VALUE;
 			}
 			// Order by tag type then relevance
-			return this.tag.type + "" + parseFloat(this.tag.source.getNormalizedRelevance());
+			return this.tag.type;
 		}
 		return this._super();
 	},
