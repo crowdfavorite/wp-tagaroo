@@ -174,11 +174,18 @@ oc.handleCalaisResponse = function(responseString) {
 		oc.tagManager.normalizeRelevance();
 
 		jQuery.each(newTags, function(i, tag) {
-			if (oc.relevanceIsSufficient(tag.source.getNormalizedRelevance())) {
-				oc.tagManager.putTagInSuggested(tag, 'auto');
-			}
-			else {
-				oc.tagManager.putTagInBlacklist(tag, 'auto');
+			// if the tag type is set and its 0 or the type is an EventFact and its 0, don't display the tag
+			if ( !(
+				( oc.allowedTagTypes.hasOwnProperty(tag.type) && 0 == oc.allowedTagTypes[tag.type] )
+				||
+				( 'EventFact' === tag.source._className && 0 == oc.allowedTagTypes.EventFact )
+			)) {
+				if (oc.relevanceIsSufficient(tag.source.getNormalizedRelevance())) {
+					oc.tagManager.putTagInSuggested(tag, 'auto');
+				}
+				else {
+					oc.tagManager.putTagInBlacklist(tag, 'auto');
+				}
 			}
 		});
 

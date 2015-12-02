@@ -357,7 +357,6 @@ function oc_request_handler() {
                                 $tag_types[$tag_type] = 0;
                             }
                         }
-                        error_log(print_r($tag_types,1));
                         update_option( 'oc_tag_types', $tag_types );
                     }
 
@@ -1184,9 +1183,11 @@ function oc_get_tag_types() {
     	'Continent' => 1,
     	'Country' => 1,
     	'Currency' => 1,
+        'DocCat' => 1,
     	'Editor' => 1,
     	'EmailAddress' => 1,
     	'EntertainmentAwardEvent' => 1,
+        'EventFact' => 1,
     	'Facility' => 1,
     	'FaxNumber' => 1,
     	'Holiday' => 1,
@@ -1216,11 +1217,11 @@ function oc_get_tag_types() {
     	'SportsEvent' => 1,
     	'SportsGame' => 1,
     	'SportsLeague' => 1,
+        'SocialTag' => 1,
     	'Technology' => 1,
     	'TVShow' => 1,
     	'TVStation' => 1,
     	'URL' => 1,
-    	'EventFact' => 1,
     );
 
     $saved_types = get_option( 'oc_tag_types', array() );
