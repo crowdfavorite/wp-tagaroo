@@ -1,8 +1,8 @@
 
-// Tokens are drag-droppable boxes that display an overlay when hovering and dragging. 
+// Tokens are drag-droppable boxes that display an overlay when hovering and dragging.
 //
-// The JS object represents the UI element but lives independently 
-// of its visual representation in the DOM. Call insertIntoDOM to add it or move 
+// The JS object represents the UI element but lives independently
+// of its visual representation in the DOM. Call insertIntoDOM to add it or move
 // it around and removeFromDOM to take it out.
 
 var cfdebugdd = false;
@@ -15,46 +15,49 @@ ddlog = function(string) {
 
 var CFToken = CFBase.extend({
 	init: function(name, id_tag, options) {
-		if (typeof id == 'undefined') {
+		if (typeof id_tag == 'undefined') {
 			this.id_tag = cf.slugify(name) + new Date().valueOf();
-		}	
+		}
+		else {
+			this.id_tag = id_tag
+		}
 		this.name = name;
 		if (typeof options != 'undefined') {
 			this.options = options;
-		}		
+		}
 	},
 
 	getInlineClass: function() {
 		return 'cf_token inline';
 	},
-	
+
 	getOverlayClass: function() {
 		return 'cf_token overlay';
 	},
-	
+
 	getInlineHTML: function() {
 		return '<li class="' + this.getInlineClass() + '" id="cf_token_inline_' + this.id_tag + '"><span class="left-endcap"></span>' + this.getContentHTML('inline') + '<span class="right-endcap"></span></li>';
 	},
-	
+
 	// override to draw content. mode can be one of ['inline' | 'overlay']
 	getContentHTML: function(mode) {
 		return '';
 	},
-	
+
 	getOverlayHTML: function() {
 		return '<div class="' + this.getOverlayClass() + '" id="cf_token_overlay_' + this.id_tag + '"><span class="left-endcap"></span>' + this.getContentHTML('overlay') +'<span class="right-endcap"></span></div>';
 	},
-	
+
 	// jQueryManip is one of: append, prepend, after, before, etc...
 	insertIntoDOM: function(jQueryManip, relativeTo) {
 		this.willBeInsertedIntoDOM();
-		
+
 		var html = this.getInlineHTML();
 		eval('jQuery(relativeTo).' + jQueryManip + '(html);');
 		jQuery('body').append(this.getOverlayHTML());
 		this.wasInsertedIntoDOM();
 	},
-	
+
 	removeFromDOM: function() {
 		if (this.isInDOM) {
 			this.willBeRemovedFromDOM();
@@ -64,7 +67,7 @@ var CFToken = CFBase.extend({
 			this.wasRemovedFromDOM();
 		}
 	},
-	
+
 	// subclasses may override
 	willBeInsertedIntoDOM: function() {
 		this.removeFromDOM();
@@ -80,7 +83,7 @@ var CFToken = CFBase.extend({
 	},
 	willBeRemovedFromDOM: function() {},
 	wasRemovedFromDOM: function() {},
-	
+
 	_inlineClickHandler: null,
 	_inlineDoubleClickHandler: null,
 	inlineHoverStart: function() {
@@ -94,7 +97,7 @@ var CFToken = CFBase.extend({
 		this.jqInline.click(this._inlineClickHandler);
 		this.jqInline.dblclick(this._inlineDoubleClickHandler);
 	},
-	
+
 	inlineHoverEnd: function() {
 		ddlog('inlineHoverEnd');
 		var poppet = this;
@@ -107,12 +110,12 @@ var CFToken = CFBase.extend({
 		this.jqInline.unbind('click', this._inlineClickHandler);
 		this.jqInline.unbind('dblclick', this._inlineDoubleClickHandler);
 	},
-	
-	inlineClicked: function(e) {		
+
+	inlineClicked: function(e) {
 	},
-	inlineDoubleClicked: function(e) {		
+	inlineDoubleClicked: function(e) {
 	},
-	
+
 	overlayHoverStart: function() {
 		ddlog('overlayHoverStart');
 		this.overlayHasHover = true;
@@ -123,9 +126,9 @@ var CFToken = CFBase.extend({
 			cf.gobbleEvent(e);
 		});
 	},
-	
+
 	overlayHoverEnd: function() {
-		ddlog('overlayHoverEnd');		
+		ddlog('overlayHoverEnd');
 		if (this.showingOverlay && !this.draggingOverlay) {
 			this.overlayHasHover = false;
 			this.jqOverlay.unbind('mousedown');
@@ -133,7 +136,7 @@ var CFToken = CFBase.extend({
 		}
 		this.overlayWaitingForHover = false;
 	},
-	
+
 	_overlayInitialMouseMovedHandler: null,
 	_overlayInitialMouseUpHandler: null,
 	overlayMouseDown: function(e) {
@@ -162,17 +165,17 @@ var CFToken = CFBase.extend({
 		this._overlayInitialMouseUpHandler = function(e) {
 			poppet.overlayMouseUp(e);
 		}
-		
+
 		jQuery('body').mousemove(this._overlayInitialMouseMovedHandler);
-		if (jQuery.browser.msie) { 
+		if (jQuery.browser.msie) {
 			jQuery('body').mouseup(this._overlayInitialMouseUpHandler);
 		}
 		else {
 			jQuery(window).mouseup(this._overlayInitialMouseUpHandler);
 		}
-		
+
 	},
-	
+
 	overlayMouseUp: function(e) {
 		ddlog('overlayMouseUp');
 		this.overlayHasMouseDown = false;
@@ -183,21 +186,21 @@ var CFToken = CFBase.extend({
 		else {
 			this.overlayClicked(e);
 		}
-		
+
 		jQuery('body').unbind('mousemove', this._overlayInitialMouseMovedHandler);
-		if (jQuery.browser.msie) { 
+		if (jQuery.browser.msie) {
 			jQuery('body').unbind('mouseup', this._overlayInitialMouseUpHandler);
 		}
 		else {
 			jQuery(window).unbind('mouseup', this._overlayInitialMouseUpHandler);
 		}
-		
+
 	},
-	
+
 	overlayClicked: function(e) {
 		ddlog('overlayClicked');
 	},
-	
+
 	_overlayDraggingMouseMovedHandler: null,
 	_overlayDraggingMouseUpHandler: null,
 	overlayDragBegin: function(e) {
@@ -206,7 +209,7 @@ var CFToken = CFBase.extend({
 		var overlayPos = cf.pagePosition(this.jqInline.get(0));
 		var paddingOffset = parseInt(this.jqOverlay.css('padding-left'));
 		this.dragOffset = { left: (overlayPos.left - e.pageX - paddingOffset), top: (overlayPos.top - e.pageY) };
-		
+
 		this._overlayDraggingMouseMovedHandler = function(e) {
 			if (poppet.draggingOverlay) {
 				poppet.overlayDragContinue(e);
@@ -214,12 +217,12 @@ var CFToken = CFBase.extend({
 			return true;
 		}
 		jQuery('body').mousemove(this._overlayDraggingMouseMovedHandler);
-		
+
 		this._overlayDraggingMouseUpHandler = function(e) {
 			poppet.overlayMouseUp(e);
 			return true;
 		}
-		if (jQuery.browser.msie) { 
+		if (jQuery.browser.msie) {
 			jQuery('body').mouseup(this._overlayDraggingMouseUpHandler);
 		}
 		else {
@@ -229,12 +232,12 @@ var CFToken = CFBase.extend({
 		this.draggingOverlay = true;
 		cf.tokenManager.dragStarted(this);
 		this.jqInline.hide();
-	},	
-	
+	},
+
 	overlayDragEnd: function(e) {
 		ddlog('overlayDragEnd');
 		jQuery('body').unbind('mousemove', this._overlayDraggingMouseMovedHandler);
-		if (jQuery.browser.msie) { 
+		if (jQuery.browser.msie) {
 			jQuery('body').unbind('mouseup', this._overlayDraggingMouseUpHandler);
 		}
 		else {
@@ -246,7 +249,7 @@ var CFToken = CFBase.extend({
 		this.overlayHoverEnd();
 		this.jqInline.show();
 	},
-	
+
 	overlayDragContinue: function(e) {
 		if (this.draggingOverlay) {
 			ddlog('overlayDragContinue: (' + e.pageX + ', ' + e.pageY + ') ');
@@ -269,7 +272,7 @@ var CFToken = CFBase.extend({
 	// the return values from this method should also *include* padding in their values. in other words,
 	// the padding will be subtracted automatically before setting the css width: and height: values.
 	//
-	// default centers the overlay	
+	// default centers the overlay
 	getOverlayFrame: function(inlineFrame, overlayFrame) {
 		var marginDeltaY = parseInt(this.jqInline.css('margin-top'));
 		var marginDeltaX = parseInt(this.jqInline.css('margin-left'));
@@ -280,7 +283,7 @@ var CFToken = CFBase.extend({
 			height: overlayFrame.height - parseInt(this.jqOverlay.css('padding-bottom')) - parseInt(this.jqOverlay.css('padding-top'))
 		};
 	},
-	
+
 	_overlayShowHideMouseMovedHandler: null,
 	showOverlay: function() {
 		ddlog('showOverlay ' + this.id_tag);
@@ -297,23 +300,23 @@ var CFToken = CFBase.extend({
 		});
 		this.showingOverlay = true;
 		this.overlayWaitingForHover = true;
-		this.didShowOverlay();		
-				
+		this.didShowOverlay();
+
 		var poppet = this;
 		this._overlayShowHideMouseMovedHandler = function(e) {
 			ddlog('_overlayShowHideMouseMovedHandler ' + poppet.id_tag + ', overlayHasHover: ' + (poppet.overlayHasHover ? 'yes' : 'no'));
-			if (poppet.showingOverlay && 
-				!poppet.overlayWaitingForHover && 
-				poppet.overlayHasHover && 
-				!poppet.draggingOverlay && 
+			if (poppet.showingOverlay &&
+				!poppet.overlayWaitingForHover &&
+				poppet.overlayHasHover &&
+				!poppet.draggingOverlay &&
 				!cf.pointInRect({ x: e.pageX, y: e.pageY }, cf.pageFrame(poppet.jqOverlay.get(0)))) {
 				ddlog('_overlayShowHideMouseMovedHandler hiding overlay ' + poppet.id_tag);
 				poppet.hideOverlay();
 			}
 		}
-		jQuery('body').mousemove(this._overlayShowHideMouseMovedHandler);		
+		jQuery('body').mousemove(this._overlayShowHideMouseMovedHandler);
 	},
-	
+
 	hideOverlay: function() {
 		this.willHideOverlay();
 		ddlog('hideOverlay ' + this.id_tag);
@@ -334,15 +337,15 @@ var CFToken = CFBase.extend({
 	didShowOverlay: function() {},
 	willHideOverlay: function() {},
 	didHideOverlay: function() {},
-	
+
 	getSortKey: function() {
 		return this.name;
 	},
-	
+
 	toString: function() {
 		return this.getSortKey();
 	},
-	
+
 	id_tag: '',
 	name: '',
 	options: {},

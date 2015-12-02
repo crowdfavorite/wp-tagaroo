@@ -1,7 +1,7 @@
 
 oc.TagToken = CFTextToken.extend({
 	init: function(tag) {
-		this._super(tag.text, 'oc_tagToken_' + cf.slugify(tag.text));
+		this._super(tag.text, 'oc_tagToken_' + cf.slugify(tag.text + tag.type));
 		this.tag = tag;
 		var poppet = this;
 		// ie does not respect the toString in our prototype. assign it by hand here.

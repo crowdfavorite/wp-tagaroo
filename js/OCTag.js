@@ -5,7 +5,7 @@ oc.Tag = CFBase.extend({
 		this.text = text;
 		this.slug = cf.slugify(text);
 		this.wpSlug = this.slug;
-		this.textToken = new oc.TagToken(this);
+
 		if ( !! source ) {
 			this.slug = this.slug + source.type.name
 			this.type = source.type.name;
@@ -20,6 +20,7 @@ oc.Tag = CFBase.extend({
 			}
 		}
 
+		this.textToken = new oc.TagToken(this);
 		oc.tagManager.registerTag(this);
 		this.source = source || null;
 
@@ -98,4 +99,3 @@ oc.Tag = CFBase.extend({
 	bucketName: 'none',
 	bucketPlacement: 'auto'	// ['user' | 'auto']
 }, 'Tag');
-
