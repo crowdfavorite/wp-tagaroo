@@ -22,6 +22,8 @@ define( 'FLICKR_API_KEY', 'f3745df3c6537073c523dc6d06751250' );
 define( 'OC_HTTP_PATH', plugin_dir_url( __FILE__ ) );
 define( 'OC_FILE_PATH', plugin_dir_path( __FILE__ ) );
 
+ load_plugin_textdomain( 'tagaroo', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
+
 function oc_agent_is_safari() {
 	static $is_safari;
 	if ( ! isset( $is_safari ) ) {
@@ -343,6 +345,22 @@ function oc_request_handler() {
 						update_option( 'oc_auto_fetch', 'no' );
 					}
 
+                    if ( isset( $_POST['oc_tag_types'] ) ) {
+                        $post_tag_types = $_POST['oc_tag_types'];
+                        $tag_types = oc_get_tag_types();
+                        foreach ( $tag_types as $tag_type => $checked ) {
+                            $sanitized_type = sanitize_title( $tag_type );
+                            if ( isset( $post_tag_types[ $sanitized_type ] ) ) {
+                                $tag_types[$tag_type] = 1;
+                            }
+                            else {
+                                $tag_types[$tag_type] = 0;
+                            }
+                        }
+                        error_log(print_r($tag_types,1));
+                        update_option( 'oc_tag_types', $tag_types );
+                    }
+
 					if ( $get_q == '' ) {
 						$get_q .= '&updated=true' . ( $key_changed ? '&oc_key_changed=true' : '' );
 					}
@@ -429,6 +447,12 @@ function oc_request_handler() {
 				if ( $licensesJSON ) {
 					print( 'oc.imageManager.flickrLicenseInfo = ' . $licensesJSON . ';' );
 				}
+
+                // Not the ideal way to do this, but using the same pattern from above.
+                $tag_types = oc_get_tag_types();
+                if ( $tag_types ) {
+                    print( 'oc.allowedTagTypes = ' . json_encode( $tag_types ) . ';' );
+                }
 
 				if ( OC_WP_GTE_23 && ! OC_WP_GTE_25 ) {
 					require( OC_FILE_PATH . '/js/mce/mce2/editor_plugin.js' );
@@ -779,7 +803,6 @@ add_action( 'admin_menu', 'oc_menu_items' );
 function oc_options_form() {
 	global $oc_api_key, $oc_key_entered, $oc_relevance_minimum, $oc_auto_fetch;
 	$error = '';
-
 	$api_msg = '';
 	if ( ! $oc_key_entered ) {
 		$api_msg = '
@@ -815,6 +838,17 @@ function oc_options_form() {
 			$distribute_checked = '';
 		}
 	}
+
+    $tag_types = oc_get_tag_types();
+    $tag_type_selection = '';
+    foreach ( $tag_types as $tag_type => $checked) {
+        $tag_type_selection .= '
+        <div>
+            <input id="' . sanitize_title( $tag_type ) . '" type="checkbox" name="oc_tag_types[' . esc_attr( sanitize_title( $tag_type ) ) . ']" ' . checked( $checked, '1', false ) . ' value="1" />
+            <label for="' . sanitize_title( $tag_type ) . '">' . esc_html( $tag_type ) .  '</label>
+        </div>';
+    }
+
 	print( '
 		<div class="wrap">
 			<h2>tagaroo</h2>
@@ -866,10 +900,21 @@ function oc_options_form() {
 				<table class="form-table">
 					<tbody>
 						<tr>
-							<th scope="row">Auto-fetch tags?</th>
+							<th scope="row">' . __( 'Auto-fetch tags?', 'tagaroo' ) . '</th>
 							<td>
 								<input type="checkbox" name="oc_auto_fetch" ' . ( $oc_auto_fetch == 'yes' ? 'checked="checked"' : '') . ' /><br/>
 							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th scope="row">' . __( 'Show the following tag types', 'tagaroo' ) . '</th>
+							<td>'
+                            . $tag_type_selection .
+							'</td>
 						</tr>
 					</tbody>
 				</table>
@@ -1124,3 +1169,60 @@ function oc_frontent_style() {
 <?php
 }
 add_action( 'wp_head', 'oc_frontent_style' );
+
+/**
+ * Get tag types and whether or not they're activated
+ *
+ * @return Array array of tag types and whether or not they're active
+ **/
+function oc_get_tag_types() {
+    // By default, show all tag types
+    $default_tag_types = array(
+    	'Anniversary' => 1,
+    	'City' => 1,
+    	'Company' => 1,
+    	'Continent' => 1,
+    	'Country' => 1,
+    	'Currency' => 1,
+    	'Editor' => 1,
+    	'EmailAddress' => 1,
+    	'EntertainmentAwardEvent' => 1,
+    	'Facility' => 1,
+    	'FaxNumber' => 1,
+    	'Holiday' => 1,
+    	'IndustryTerm' => 1,
+    	'Journalist' => 1,
+    	'MarketIndex' => 1,
+    	'MedicalCondition' => 1,
+    	'MedicalTreatment' => 1,
+    	'Movie' => 1,
+    	'MusicAlbum' => 1,
+    	'MusicGroup' => 1,
+    	'NaturalFeature' => 1,
+    	'OperatingSystem' => 1,
+    	'Organization' => 1,
+    	'Person' => 1,
+    	'PharmaceuticalDrug' => 1,
+    	'PhoneNumber' => 1,
+    	'PoliticalEvent' => 1,
+    	'Position' => 1,
+    	'Product' => 1,
+    	'ProgrammingLanguage' => 1,
+    	'ProvinceOrState' => 1,
+    	'PublishedMedium' => 1,
+    	'RadioProgram' => 1,
+    	'RadioStation' => 1,
+    	'Region' => 1,
+    	'SportsEvent' => 1,
+    	'SportsGame' => 1,
+    	'SportsLeague' => 1,
+    	'Technology' => 1,
+    	'TVShow' => 1,
+    	'TVStation' => 1,
+    	'URL' => 1,
+    	'EventFact' => 1,
+    );
+
+    $saved_types = get_option( 'oc_tag_types', array() );
+    return array_merge( $default_tag_types, $saved_types );
+}
