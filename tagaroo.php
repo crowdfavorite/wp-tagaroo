@@ -910,7 +910,7 @@ function oc_options_form() {
 				<table class="form-table">
 					<tbody>
 						<tr>
-							<th scope="row">' . __( 'Show the following tag types', 'tagaroo' ) . '</th>
+							<th scope="row">' . __( 'Show the following tag types:', 'tagaroo' ) . '</th>
 							<td>'
                             . $tag_type_selection .
 							'</td>
