@@ -276,7 +276,7 @@ oc.ArtifactManager = CFBase.extend({
 		},
 
 		eventFactDisplayText: {
-			Acquisition: 'M&A',
+			Acquisition: 'Acquisition',
 			Alliance: 'Business Partnership',
 			AnalystEarningsEstimate: 'Earnings Estimate',
 			AnalystRecommendation: 'Analyst Recommendation',
@@ -334,7 +334,7 @@ oc.ArtifactManager = CFBase.extend({
 			IPO: 'IPO',
 			JointVenture: 'Business Partnership',
 			ManMadeDisaster: 'Man-Made Disaster',
-			Merger: 'M&A',
+			Merger: 'Merger',
 			MilitaryAction: 'Military Action',
 			MovieRelease: 'Movie Release',
 			MusicAlbumRelease: 'Music Album Release',
