@@ -61,7 +61,8 @@ oc.Entity = oc.TagSource.extend({
 		'Region' : 'Geography',
 		'Editor' : 'People',
 		'Person' : 'People',
-		'Position' : 'People'
+		'Position' : 'People',
+		'Journalist' : 'People'
 	},
 	eventsFacts: {},
 	nInstances: 1
