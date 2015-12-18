@@ -8,7 +8,7 @@ oc.Tag = CFBase.extend({
 
 		if ( !! source ) {
 			this.slug = this.slug + source.type.name
-			this.type = source.type.name;
+			this.type = source.getTagTypeName();
 			if ( 'Company' === this.type ) {
 				// Dont store companies w/o permids
 				if ( undefined !== source.permID ) {
