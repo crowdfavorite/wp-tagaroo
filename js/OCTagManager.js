@@ -268,7 +268,7 @@ oc.TagManager = CFBase.extend({
 				}
 				else {
 					this.filterSuggestedByType(this.suggestedFilter);
-					jQuery('#oc_tag_filter_select option[label=' + this.suggestedFilter + ']').attr('selected', 'selected');
+					jQuery('#oc_tag_filter_select option[label="' + this.suggestedFilter + '"]').attr('selected', 'selected');
 				}
 			}
 		}

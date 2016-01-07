@@ -20,8 +20,9 @@ oc.Entity = oc.TagSource.extend({
 		}
 	},
 
+	// Handles entities such as Company, Person etc...
 	getTagText: function() {
-		return this.name;
+		return this.maybeMapTagText(this.name);
 	},
 
 	getTagTypeName: function() {
@@ -49,20 +50,35 @@ oc.Entity = oc.TagSource.extend({
 		if ('undefined' !== typeof(this.eventTypeMap[name])) {
 			return this.eventTypeMap[name];
 		}
-		return name
+		return name;
+	},
+
+	maybeMapTagText : function (text) {
+		var typeName = this.type.name;
+		if ('undefined' !== typeof(this.eventTypeMap[typeName])) {
+			if ('Person' == typeName) {
+				return text;
+			}
+			else if ( 'ProvinceOrState' == typeName ) {
+				return 'Province/State: ' + text;
+			}
+			return typeName + ': ' + text;
+		}
+		return text;
 	},
 
 	// Map certain Entity types to another or a grouping
 	eventTypeMap : {
 		'City' : 'Geography',
-		'Country' : 'Geography',
+		'Company' : 'Geography',
 		'Continent' : 'Geography',
+		'Country' : 'Geography',
 		'ProvinceOrState' : 'Geography',
 		'Region' : 'Geography',
-		'Editor' : 'People',
-		'Person' : 'People',
-		'Position' : 'People',
-		'Journalist' : 'People'
+		'Editor' : 'Person',
+		'Person' : 'Person',
+		// 'Position' : 'Person',
+		'Journalist' : 'Person'
 	},
 	eventsFacts: {},
 	nInstances: 1
