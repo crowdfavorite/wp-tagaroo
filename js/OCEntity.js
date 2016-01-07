@@ -70,7 +70,6 @@ oc.Entity = oc.TagSource.extend({
 	// Map certain Entity types to another or a grouping
 	eventTypeMap : {
 		'City' : 'Geography',
-		'Company' : 'Geography',
 		'Continent' : 'Geography',
 		'Country' : 'Geography',
 		'ProvinceOrState' : 'Geography',
@@ -78,7 +77,8 @@ oc.Entity = oc.TagSource.extend({
 		'Editor' : 'Person',
 		'Person' : 'Person',
 		// 'Position' : 'Person',
-		'Journalist' : 'Person'
+		'Journalist' : 'Person',
+		'Company' : 'Organization'
 	},
 	eventsFacts: {},
 	nInstances: 1
