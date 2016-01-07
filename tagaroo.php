@@ -1205,7 +1205,7 @@ function oc_get_tag_types() {
     	'OperatingSystem' => 1,
     	'Organization' => 1,
     	//'Person' => 1,
-        'People' => 1,
+        'Person' => 1,
     	'PharmaceuticalDrug' => 1,
     	//'PhoneNumber' => 1,
     	'PoliticalEvent' => 1,
