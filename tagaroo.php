@@ -1220,7 +1220,7 @@ function oc_get_tag_types() {
     	'SportsEvent' => 1,
     	'SportsGame' => 1,
     	'SportsLeague' => 1,
-        //'SocialTag' => 1,
+        'SocialTag' => 1,
     	'Technology' => 1,
     	'TVShow' => 1,
     	'TVStation' => 1,
