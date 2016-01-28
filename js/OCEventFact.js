@@ -12,7 +12,7 @@ oc.EventFact = oc.TagSource.extend({
 
 	getTagTypeName: function() {
 		var name = oc.artifactManager.artifactDisplayInfo.eventFactDisplayText[this.type.name];
-		if ( name && ( name == 'Acquisition' || 'Alliance' == name || 'Deal' == name || 'Merger' == name ) ) {
+		if ( name && ( 'Acquisition' == name || 'Alliance' == name || 'Deal' == name || 'Merger' == name ) ) {
 			return 'M&A';
 		}
 		return 'Event/Fact';
