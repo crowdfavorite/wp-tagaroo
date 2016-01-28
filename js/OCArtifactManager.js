@@ -6,7 +6,7 @@ oc.ArtifactManager = CFBase.extend({
 
 	// temporary solution
 	unarchiveArtifact: function(archivedArtifact, version) {
-		
+
 		switch (version.toString()) {
 			case '1':
 			case '1.0':
@@ -43,10 +43,10 @@ oc.ArtifactManager = CFBase.extend({
 	generateArtifacts: function(descriptions) {
 		var poppet = this;
 		var resultArray = [];
-		
+
 		// make one pass creating all the entities, doc cats, social tags, etc
 		jQuery.each(descriptions, function(i, desc) {
-			
+
 			if (poppet.isSocialTagDescription(desc)) {
 				var newSocialTag = poppet.socialTagFromDescription(desc);
 				if (newSocialTag) {
@@ -69,8 +69,8 @@ oc.ArtifactManager = CFBase.extend({
 				}
 			}
 
-		});	
-		
+		});
+
 		// make a second pass:
 		// - create events/facts and attach them to entities if appropriate
 		// - attach relevance ratings
@@ -83,7 +83,7 @@ oc.ArtifactManager = CFBase.extend({
 					resultArray.push(newEventFact);
 				}
 			}
-			
+
 			// check for a relevance rating
 			var relevance = poppet.relevanceFromDescription(desc);
 			if (relevance !== null) {
@@ -92,10 +92,10 @@ oc.ArtifactManager = CFBase.extend({
 					poppet.entityMap[targetURL].setRawRelevance(relevance);
 				}
 			}
-		});		
+		});
 		return resultArray;
 	},
-	
+
 	deleteArtifact: function(artifact) {
 		if (this.entityMap[artifact.url]) {
 			delete this.entityMap[artifact.url];
@@ -107,7 +107,7 @@ oc.ArtifactManager = CFBase.extend({
 			delete this.eventFactMap[artifact.url];
 		}
 	},
-	
+
 	registerArtifact: function(artifact) {
 		switch (artifact._className) {
 			case 'EventFact':
@@ -121,7 +121,7 @@ oc.ArtifactManager = CFBase.extend({
 			break;
 		}
 	},
-	
+
 	entityFromDescription: function(rdfDescription) {
 		var url = rdfDescription['rdf:about'];
 		if (this.entityMap[url]) {
@@ -131,7 +131,7 @@ oc.ArtifactManager = CFBase.extend({
 			return new oc.Entity(rdfDescription);
 		}
 	},
-	
+
 	eventFactFromDescription: function(rdfDescription) {
 		var url = rdfDescription['rdf:about'];
 		if (this.eventFactMap[url]) {
@@ -141,7 +141,7 @@ oc.ArtifactManager = CFBase.extend({
 			return new oc.EventFact(rdfDescription);
 		}
 	},
-	
+
 	socialTagFromDescription: function(rdfDescription) {
 		var url = rdfDescription['rdf:about'];
 		if (this.socialTagMap[url]) {
@@ -151,7 +151,7 @@ oc.ArtifactManager = CFBase.extend({
 			return new oc.SocialTag(rdfDescription);
 		}
 	},
-	
+
 	isEventFactDescription: function(rdfDescription) {
 		// ignore anything with a name
 		if (!rdfDescription.name) {
@@ -202,19 +202,19 @@ oc.ArtifactManager = CFBase.extend({
 		}
 		return null;
 	},
-	
+
 	registerArtifactType: function(artifactType) {
 		this.artifactTypes[artifactType.url] = artifactType;
 	},
-	
+
 	getArtifactTypeNames: function() {
 		var names = [];
 		for (var url in this.artifactTypes) {
 			names.push(this.artifactTypes[url].name);
 		}
 		return names;
-	},	
-	
+	},
+
 	getArtifacts: function() {
 		var result = [];
 		for(var url in this.entityMap) {
@@ -232,7 +232,7 @@ oc.ArtifactManager = CFBase.extend({
 
 		return result;
 	},
-	
+
 	resolveAmbiguousEntity: function(artifact) {
 		for (var url in this.entityMap) {
 			if (!this.entityMap[url].isAmbiguous() && this.entityMap[url].getSubjectURL() == artifact.url) {
@@ -241,91 +241,126 @@ oc.ArtifactManager = CFBase.extend({
 		}
 		return null;
 	},
-		
+
 	// maps from RDF:description url to artifact objects
 	entityMap: {},
 	eventFactMap: {},
 	docCatMap: {},
 	socialTagMap: {},
-	
-	// all known artifact types for this post. 
+
+	// all known artifact types for this post.
 	// v1: maps from artifact type name to ArtifactType object
 	// v1.1: maps from artifact type full url to ArtifactType object
 	artifactTypes: {},
 
 	artifactDisplayInfo: {
-		
+
 		docCatDisplayText: {
-			Politics: 'Politics',
-			Technology_Internet: 'Technology/Internet',
-			Entertainment_Culture: 'Entertainment/Culture',
-			Health_Medical_Pharma: 'Health/Medical/Pharmaceuticals',
-			Law_Crime: 'Law/Crime',
 			Business_Finance: 'Business/Finance',
-			Environment: 'Environment',
-			Hospitality_Recreation: 'Hospitality/Recreation',
-			Sports: 'Sports',
-			Weather: 'Weather',          
 			Disaster_Accident: 'Disaster/Accident',
 			Education: 'Education',
+			Entertainment_Culture: 'Entertainment/Culture',
+			Environment: 'Environment',
+			Health_Medical_Pharma: 'Health/Medical/Pharmaceuticals',
+			Hospitality_Recreation: 'Hospitality/Recreation',
 			Human_Interest: 'Human Interest',
 			Labor: 'Labor',
+			Law_Crime: 'Law/Crime',
+			Politics: 'Politics',
 			Religion_Belief: 'Religion/Belief',
 			Social_Issues: 'Social Issues',
-			War_Conflict: 'War/Conflict'
+			Sports: 'Sports',
+			Technology_Internet: 'Technology/Internet',
+			War_Conflict: 'War/Conflict',
+			Weather: 'Weather'
 		},
-		
+
 		eventFactDisplayText: {
-			Acquisition: 'M&A',
+			Acquisition: 'Acquisition',
 			Alliance: 'Business Partnership',
 			AnalystEarningsEstimate: 'Earnings Estimate',
 			AnalystRecommendation: 'Analyst Recommendation',
+			ArmedAttack: 'Armed Attack',
+			ArmsPurchaseSale: 'Arms Purchase Sale',
 			Arrest: 'Judicial Event',
 			Bankruptcy: 'Bankruptcy',
 			BonusSharesIssuance: 'Bonus Shares Issuance',
 			BusinessRelation: 'Business Partnership',
 			Buybacks: 'Security Buyback',
+			CandidatePosition: 'Candidate Position',
 			CompanyAccountingChange: 'Accounting Change',
+			CompanyAffiliates: 'Company Affiliates',
+			CompanyCompetitor: 'Company Competitor',
+			CompanyCustomer: 'Company Customer',
 			CompanyEarningsAnnouncement: 'Earnings Announcement',
 			CompanyEarningsGuidance: 'Earnings Guidance',
+			CompanyEmployeesNumber: 'Company Employees Number',
 			CompanyExpansion: 'Company Expansion',
 			CompanyForceMajeure: 'Force Majeure',
+			CompanyFounded: 'Company Founded',
+			CompanyInvestigation: 'Company Investigation',
 			CompanyInvestment: 'Funding',
 			CompanyLaborIssues: 'Labor Issues',
 			CompanyLayoffs: 'Layoffs',
 			CompanyLegalIssues: 'Legal Issues',
 			CompanyListingChange: 'Company Listing Change',
+			CompanyLocation: 'Company Location',
 			CompanyMeeting: 'General or Shareholder Meeting',
 			CompanyNameChange: 'Name Change',
+			CompanyProduct: 'Company Product',
 			CompanyReorganization: 'Reorganization',
 			CompanyRestatement: 'Restatement',
+			CompanyTechnology: 'Company Technology',
+			CompanyTicker: 'Company Ticker',
+			CompanyUsingProduct: 'Company Using Product',
 			ConferenceCall: 'Conference Call',
+			ContactDetails: 'Contact Details',
 			Conviction: 'Judicial Event',
 			CreditRating: 'Credit Rating',
+			Deal: 'Deal',
 			DebtFinancing: 'Debt Financing',
 			DelayedFiling: 'Delayed Filing',
+			DiplomaticRelations: 'Diplomatic Relations',
 			Dividend: 'Dividend Issuance',
 			EmploymentChange: 'Employment Change',
+			EmploymentRelation: 'Employment Relation',
 			EnvironmentalIssue: 'Environmental Issues',
+			EquityFinancing: 'Equity Financing',
 			Extinction: 'Extinction',
+			FamilyRelation: 'Family Relation',
 			FDAPhase: 'FDA Phase',
-			IPO: 'IPO',
+			IndicesChanges: 'Indices Changes',
 			Indictment: 'Judicial Event',
+			IPO: 'IPO',
 			JointVenture: 'Business Partnership',
 			ManMadeDisaster: 'Man-Made Disaster',
-			Merger: 'M&A',
+			Merger: 'Merger',
+			MilitaryAction: 'Military Action',
 			MovieRelease: 'Movie Release',
 			MusicAlbumRelease: 'Music Album Release',
 			NaturalDisaster: 'Natural Disaster',
 			PatentFiling: 'Patent Filing',
 			PatentIssuance: 'Patent Issuance',
+			PersonAttributes: 'Person Attributes',
+			PersonCareer: 'Person Career',
 			PersonCommunication: 'Person Communication and Meetings',
+			PersonEducation: 'Person Education',
+			PersonEmailAddress: 'Person Email Address',
+			PersonLocation: 'Person Location',
+			PersonParty: 'Person Party',
+			PersonRelation: 'Person Relation',
 			PersonTravel: 'Person Travel',
+			PoliticalEndorsement: 'Political Endorsement',
+			PoliticalRelationship: 'Political Relationship',
+			PollsResult: 'Polls Result',
+			ProductIssues: 'Product Issues',
 			ProductRecall: 'Product Recall',
 			ProductRelease: 'Product Release',
+			Quotation: 'Quotation',
 			SecondaryIssuance: 'Second Stock Issuance',
 			StockSplit: 'Stock Split',
-			Trial: 'Judicial Event'
+			Trial: 'Judicial Event',
+			VotingResult: 'Voting Result'
 		}
 	}
 });

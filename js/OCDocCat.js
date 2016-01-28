@@ -33,7 +33,7 @@ oc.DocCat = oc.TagSource.extend({
 	},
 
 	shouldGenerateTag: function() {
-		return this.name !== 'Other' && (this.score < .6);
+		return this.name !== 'Other' && (this.score > .6);
 	},
 
 	score: 0

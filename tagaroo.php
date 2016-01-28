@@ -3,7 +3,7 @@
 Plugin Name: tagaroo
 Plugin URI: http://tagaroo.opencalais.com
 Description: Find and suggest tags and photos (from Flickr) for your content. Integrates with the Calais service.
-Version: 1.5.0
+Version: 1.5.1
 Author: Crowd Favorite and Reuters
 Author URI: http://crowdfavorite.com
 License: GPL2
@@ -21,6 +21,8 @@ define( 'FLICKR_API_KEY', 'f3745df3c6537073c523dc6d06751250' );
 
 define( 'OC_HTTP_PATH', plugin_dir_url( __FILE__ ) );
 define( 'OC_FILE_PATH', plugin_dir_path( __FILE__ ) );
+
+ load_plugin_textdomain( 'tagaroo', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 
 function oc_agent_is_safari() {
 	static $is_safari;
@@ -101,7 +103,7 @@ function oc_ping_oc_api( $content, $content_status = OC_DRAFT_CONTENT, $paramsXM
 //		$key = OC_DRAFT_API_KEY;
 //	}
 //	else {
-		$key = $oc_api_key;
+	$key = $oc_api_key;
 //	}
 
 
@@ -120,16 +122,60 @@ function oc_ping_oc_api( $content, $content_status = OC_DRAFT_CONTENT, $paramsXM
 	return $response;
 }
 
+function oc_format_content( $content ) {
+	$block_tags = array(
+		'address',
+		'article',
+		'aside',
+		'blockquote',
+		'canvas',
+		'dd',
+		'div',
+		'dl',
+		'fieldset',
+		'figcaption',
+		'figure',
+		'footer',
+		'form',
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'header',
+		'hgroup',
+		'hr',
+		'main',
+		'nav',
+		'output',
+		'p',
+		'pre',
+		'section',
+		'table',
+		'tfoot',
+		'ul',
+		'video',
+		'li',
+		'br'
+	);
+	foreach ($block_tags as $block_tag) {
+		$content = str_ireplace(array( '<'.$block_tag, $block_tag.'>', $block_tag.' />', $block_tag.'/>'), array(' <'.$block_tag, $block_tag.'> ', $block_tag.' /> ', $block_tag.' /> '), $content);
+	}
+	return strip_tags($content);
+}
+
 function oc_do_ping_oc_api( $key, $content, $paramsXML ) {
 	if ( ! isset( $_POST['publish'] ) && ! isset( $_POST['save'] ) ) {
-		$result = wp_remote_post( 'https://api.thomsonreuters.com/permid/calais', array(
+		$result = wp_remote_post( 'https://api.thomsonreuters.com:443/permid/calais', array(
 			'headers' => array(
 				'x-ag-access-token' => $key,
 				'Content-Type' => 'text/xml',
 				'outputFormat' => 'xml/rdf',
 			),
-			'body' => '<body>'.$content.'</body>',
+			'body' => '<body>'.oc_format_content($content).'</body>',
 		) );
+
 		if ( ! is_wp_error( $result ) && isset( $result['body'] ) && isset( $result['response']['code'] ) ) {
 
 			// Requested xml/rdf, but errors come back as json encoded it appears as of Jun 17 2015
@@ -299,6 +345,21 @@ function oc_request_handler() {
 						update_option( 'oc_auto_fetch', 'no' );
 					}
 
+                    if ( isset( $_POST['oc_tag_types'] ) ) {
+                        $post_tag_types = $_POST['oc_tag_types'];
+                        $tag_types = oc_get_tag_types();
+                        foreach ( $tag_types as $tag_type => $checked ) {
+                            $sanitized_type = sanitize_title( $tag_type );
+                            if ( isset( $post_tag_types[ $sanitized_type ] ) ) {
+                                $tag_types[$tag_type] = 1;
+                            }
+                            else {
+                                $tag_types[$tag_type] = 0;
+                            }
+                        }
+                        update_option( 'oc_tag_types', $tag_types );
+                    }
+
 					if ( $get_q == '' ) {
 						$get_q .= '&updated=true' . ( $key_changed ? '&oc_key_changed=true' : '' );
 					}
@@ -385,6 +446,12 @@ function oc_request_handler() {
 				if ( $licensesJSON ) {
 					print( 'oc.imageManager.flickrLicenseInfo = ' . $licensesJSON . ';' );
 				}
+
+                // Not the ideal way to do this, but using the same pattern from above.
+                $tag_types = oc_get_tag_types();
+                if ( $tag_types ) {
+                    print( 'oc.allowedTagTypes = ' . json_encode( $tag_types ) . ';' );
+                }
 
 				if ( OC_WP_GTE_23 && ! OC_WP_GTE_25 ) {
 					require( OC_FILE_PATH . '/js/mce/mce2/editor_plugin.js' );
@@ -735,7 +802,6 @@ add_action( 'admin_menu', 'oc_menu_items' );
 function oc_options_form() {
 	global $oc_api_key, $oc_key_entered, $oc_relevance_minimum, $oc_auto_fetch;
 	$error = '';
-
 	$api_msg = '';
 	if ( ! $oc_key_entered ) {
 		$api_msg = '
@@ -771,6 +837,17 @@ function oc_options_form() {
 			$distribute_checked = '';
 		}
 	}
+
+    $tag_types = oc_get_tag_types();
+    $tag_type_selection = '';
+    foreach ( $tag_types as $tag_type => $checked) {
+        $tag_type_selection .= '
+        <div>
+            <input id="' . sanitize_title( $tag_type ) . '" type="checkbox" name="oc_tag_types[' . esc_attr( sanitize_title( $tag_type ) ) . ']" ' . checked( $checked, '1', false ) . ' value="1" />
+            <label for="' . sanitize_title( $tag_type ) . '">' . esc_html( $tag_type ) .  '</label>
+        </div>';
+    }
+
 	print( '
 		<div class="wrap">
 			<h2>tagaroo</h2>
@@ -780,7 +857,8 @@ function oc_options_form() {
 						<tr>
 							<th scope="row">Calais API Key</th>
 							<td>
-								<input type="text" size="24" name="oc_api_key" autocomplete="off" value="' . $oc_api_key . '" /><br/>' . $api_msg.$error . '
+								<input type="text" size="50" name="oc_api_key" autocomplete="off" value="' . $oc_api_key . '" /><br/>' . $api_msg.$error . '
+								<p><a href="http://new.opencalais.com/opencalais-api/" target="_blank">Get your OpenCalai API key</p>
 							</td>
 						</tr>
 					</tbody>
@@ -795,7 +873,7 @@ function oc_options_form() {
 								<label for="oc_privacy_searchable">Searched</label><br/>
 								<input id="oc_privacy_distribute" type="checkbox" name="oc_privacy_distribute" ' . $distribute_checked . ' />
 								<label for="oc_privacy_distribute">Distributed</label><br/>
-								<p><a href="http://opencalais.com/page/API_terms_of_use">Only public, published posts will be indexed by Calais</a></p>
+								<p><a href="http://new.opencalais.com/open-calais-terms-of-service/">Only public, published posts will be indexed by Calais</a></p>
 							</td>
 						</tr>
 					</tbody>
@@ -821,10 +899,21 @@ function oc_options_form() {
 				<table class="form-table">
 					<tbody>
 						<tr>
-							<th scope="row">Auto-fetch tags?</th>
+							<th scope="row">' . __( 'Auto-fetch tags?', 'tagaroo' ) . '</th>
 							<td>
 								<input type="checkbox" name="oc_auto_fetch" ' . ( $oc_auto_fetch == 'yes' ? 'checked="checked"' : '') . ' /><br/>
 							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th scope="row">' . __( 'Show the following tag types:', 'tagaroo' ) . '</th>
+							<td>'
+                            . $tag_type_selection .
+							'</td>
 						</tr>
 					</tbody>
 				</table>
@@ -926,78 +1015,117 @@ function oc_save_post( $post_id, $post ) {
 		// Possibly want to add to the existing data in case the post changes and new tags are supplied?
 		update_post_meta( $post_id, 'oc_tag_data', stripslashes( $_POST['oc_tag_data'] ) );
 	}
-
 }
 add_action( 'save_post', 'oc_save_post', 10, 2 );
 
-function oc_filter_content_permid( $content ) {
+function oc_filter_content( $content ) {
 	include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
 	global $post;
 	$footer_markup = false;
 	$preg_pattern = false;
 
 	if ( is_single() && 'post' == $post->post_type ) {
-		$tag_data = json_decode( get_post_meta( $post->ID, 'oc_tag_data', true ) );
+		$types = array( 'Company', 'SocialTag' );
+		$tags_on_post = oc_get_tags_on_post( $post->ID );
 
-		if ( !empty( $tag_data )  && isset( $tag_data->Company ) ) {
-
-
-			// Also needs to be a tag attached to the post
-			$post_tag_names = oc_tag_names_filter( $post->ID );
+		foreach ($types as $type) {
 			$replacements = array();
 
-			foreach ( $tag_data->Company as $company_data ) {
-				$permid_url = 'https://permid.org/1-' . $company_data->permID;
-				$link_start = '<a href="' . esc_url( $permid_url ) . '">';
-				$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
-
-				// Only parse companies that have been added
-				if ( in_array( $company_data->name, $post_tag_names ) ) {
+			foreach ( $tags_on_post[ $type ] as $tag ) {
+				$url = oc_filter_get_url( $tag, $type );
+				if ( $url ) {
+					$link_start = '<a href="' . esc_url( $url ) . '">';
+					$link_end = '<i class="oc-external-link fa fa-external-link"></i></a>';
 					// Order matters here, commonname is likely to be contained within the name and be shorter
-					$preg_pattern .= preg_quote( $company_data->name ) . '|' . preg_quote( $company_data->ticker ) . '|' . preg_quote( $company_data->commonName ) . '|' ;
-					$footer_markup .= '<li>' . $link_start . esc_html( $company_data->name ) . $link_end . '</li>';
+					$replacements[] = array(
+						'preg_pattern' => oc_filter_pattern( $tag, $type ),
+						'replacement' => array(
+							'link_start' => $link_start,
+							'link_end' => $link_end,
+						)
+					);
+
+					$footer_markup .= '<li>' . $link_start . esc_html( $tag['name'] ) . $link_end . '</li>';
 				}
 			}
 
-			if ( ! empty( $footer_markup ) ) {
-				$footer_markup = '<ul>' . $footer_markup . '</ul>';
+		// Make sure that a tags are not being inserted into other a tags
+			if ( ! empty( $replacements ) ) {
+				$html = str_get_html( $content );
+				foreach ( $html->find("text") as $element ) {
+					foreach ( $replacements as $replacement_data ) {
+						$preg_pattern = trim( $replacement_data['preg_pattern'], '|' );
+						if ( ! oc_parent_has_a_tag( $element ) ) {
+							$element->innertext = preg_replace( '/\b(' . $preg_pattern . ')\b/i', '$1' . $replacement_data['replacement']['link_start'] . $replacement_data['replacement']['link_end'], $element->innertext );
+						}
+					}
+				}
+				$content = $html;
 			}
 		}
-	}
-
-
-	// Make sure that a tags are not being inserted into other a tags
-	if ( ! empty( $preg_pattern ) ) {
-		$html = str_get_html($content);
-		foreach ($html->find("text") as $element) {
-			// Get rid of final |
-			$preg_pattern = trim( $preg_pattern, '|' );
-			if ( ! oc_parent_has_a_tag( $element ) ) {
-				$element->innertext = preg_replace( '/\b(' . $preg_pattern . ')\b/i', '$1' . $link_start . $link_end, $element->innertext );
-			}
-		}
-		$content = $html;
 	}
 
 	if ( ! empty ( $footer_markup ) ) {
 		$content .= '<hr /><h4>Associated Links</h4>' . $footer_markup . '<img class="oc-trlogo" src="' . esc_url( plugin_dir_url( __FILE__ ) . 'images/tr-logo.png' ) . '" /><hr class="oc-hr" />';
 	}
-
 	return $content;
-
 }
-add_filter( 'the_content', 'oc_filter_content_permid' );
+add_filter( 'the_content', 'oc_filter_content' );
 
-function oc_tag_names_filter( $post_id ) {
-	$tags = wp_get_post_tags( $post_id );
-	$tag_names = array();
-	foreach ($tags as $tag_data) {
-		$tag_names[] = $tag_data->name;
+function oc_get_tags_on_post( $post_id ) {
+	$tags = array(
+		'SocialTag' => array(),
+		'Company' => array(),
+	);
+
+	$meta = get_post_meta( $post_id, 'oc_metadata', true );
+	$data = json_decode( $meta );
+
+	if ( isset( $data->tags )  ) {
+		foreach ( $data->tags as $tag ) {
+
+			if ( isset( $tag->type ) && 'current' == $tag->bucketName ) {
+				if ( 'SocialTag' == $tag->type ) {
+					$tags['SocialTag'][] = array(
+						'name' => $tag->source->name,
+					);
+				}
+				else if ( 'Company' == $tag->type ) {
+					$tags['Company'][] = array(
+						'name' => $tag->source->name,
+						'fullName' => $tag->source->fullName,
+						'ticker' => isset( $tag->source->ticker) ? $tag->source->ticker : false,
+						'permID' => isset( $tag->source->permID ) ? $tag->source->permID : false,
+					);
+				}
+			}
+		}
+	}
+	return $tags;
+}
+
+function oc_filter_get_url( $tag, $type ) {
+	$url = false;
+	if ( 'Company' == $type && ! empty( $tag['permID'] ) ) {
+		$url = 'https://permid.org/1-' . $tag['permID'];
+	}
+	else {
+		$url = 'https://en.wikipedia.org/w/index.php?title=' . $tag['name'] . '&redirect=yes';
 	}
 
-	return $tag_names;
+	return $url;
 }
 
+function oc_filter_pattern( $tag, $type ) {
+	$pattern = preg_quote( $tag['name'] ) . '|';
+	if ( 'Company' == $type ) {
+	  $pattern .= ! empty( $tag['ticker'] ) ? preg_quote( $tag['ticker'] ) . '|' : '';
+	  // Fullname takes prescendence, match that first
+	  $pattern = ( ! empty( $tag['fullName'] ) ? preg_quote( $tag['fullName'] ) . '|' : '' ) . $pattern ;
+	}
+
+	return trim( $pattern, '|' );
+}
 
 function oc_parent_has_a_tag( $element ) {
 	$has_a = false;
@@ -1040,3 +1168,65 @@ function oc_frontent_style() {
 <?php
 }
 add_action( 'wp_head', 'oc_frontent_style' );
+
+/**
+ * Get tag types and whether or not they're activated
+ *
+ * @return Array array of tag types and whether or not they're active
+ **/
+function oc_get_tag_types() {
+    // By default, show all tag types
+    $default_tag_types = array(
+    	'Anniversary' => 1,
+    	//'City' => 1,
+    	//'Company' => 1,
+    	//'Continent' => 1,
+    	//'Country' => 1,
+    	'Currency' => 1,
+        //'DocCat' => 1,
+    	//'Editor' => 1,
+    	//'EmailAddress' => 1,
+    	'EntertainmentAwardEvent' => 1,
+        'EventFact' => 1,
+    	'Facility' => 1,
+    	//'FaxNumber' => 1,
+        'Geography' => 1,
+    	'Holiday' => 1,
+    	'IndustryTerm' => 1,
+    	//'Journalist' => 1,
+        'M&A' => 1, // JS need &amp;
+    	'MarketIndex' => 1,
+    	'MedicalCondition' => 1,
+    	'MedicalTreatment' => 1,
+    	'Movie' => 1,
+    	'MusicAlbum' => 1,
+    	'MusicGroup' => 1,
+    	'NaturalFeature' => 1,
+    	'OperatingSystem' => 1,
+    	'Organization' => 1,
+    	//'Person' => 1,
+        'Person' => 1,
+    	'PharmaceuticalDrug' => 1,
+    	//'PhoneNumber' => 1,
+    	'PoliticalEvent' => 1,
+    	//'Position' => 1,
+    	//'Product' => 1,
+    	'ProgrammingLanguage' => 1,
+    	//'ProvinceOrState' => 1,
+    	'PublishedMedium' => 1,
+    	'RadioProgram' => 1,
+    	'RadioStation' => 1,
+    	//'Region' => 1,
+    	'SportsEvent' => 1,
+    	'SportsGame' => 1,
+    	'SportsLeague' => 1,
+        'SocialTag' => 1,
+    	'Technology' => 1,
+    	'TVShow' => 1,
+    	'TVStation' => 1,
+    	//'URL' => 1,
+    );
+
+    $saved_types = get_option( 'oc_tag_types', array() );
+    return array_merge( $default_tag_types, $saved_types );
+}
