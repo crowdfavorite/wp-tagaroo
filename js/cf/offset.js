@@ -1,5 +1,11 @@
+
 // Create innerHeight, innerWidth, outerHeight and outerWidth methods
 jQuery.each(["Height", "Width"], function(i, name){
+
+	function num(elem, prop) {
+		elem = elem.jquery ? elem[0] : elem;
+		return elem && parseInt( jQuery.css(elem, prop, true), 10 ) || 0;
+	}
 
 	var tl = name == "Height" ? "Top"    : "Left",  // top or left
 		br = name == "Height" ? "Bottom" : "Right"; // bottom or right
@@ -22,7 +28,4 @@ jQuery.each(["Height", "Width"], function(i, name){
 
 });
 
-function num(elem, prop) {
-	elem = elem.jquery ? elem[0] : elem;
-	return elem && parseInt( jQuery.css(elem, prop, true), 10 ) || 0;
-}
+

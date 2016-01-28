@@ -20,12 +20,11 @@ oc.getFormatVersion = function() {
 oc.prepTagType = function(artifact) {
 	var type = artifact.type.name;
 	var tagdata = {};
-
 	if ( 'Company' === type ) {
 		// Dont store companies w/o permids
 		if ( undefined !== artifact.permID ) {
 			tagdata.name = artifact.name;
-			tagdata.commonName = artifact.commonName;
+			tagdata.fullName = artifact.fullName;
 			tagdata.permID = artifact.permID;
 			tagdata.ticker = artifact.ticker;
 		}
@@ -121,7 +120,6 @@ oc.hideWorkingIndicator = function(responseString) {
 
 
 oc.handleCalaisResponse = function(responseString) {
-
 	if (responseString.indexOf('__oc_request_failed__') >= 0) {
 		eval('var errorObject = ' + responseString.substring('__oc_request_failed__'.length));
 		if (!oc.docLangWorkaround || (errorObject.error.indexOf('Unsupported document language') == -1)) {
@@ -136,7 +134,6 @@ oc.handleCalaisResponse = function(responseString) {
 		oc.lastResponse = jQuery.xmlToJSON(jQuery.parseXML(responseString));
 	}
 	catch (error) {
-		//console.error(error);
 		throw error;
 	}
 
@@ -149,7 +146,6 @@ oc.handleCalaisResponse = function(responseString) {
 
 		var artifacts = oc.artifactManager.generateArtifacts(oc.lastResponse.Description);
 		var newTags = [];
-
 
 		jQuery.each(artifacts, function(i, artifact) {
 			if (artifact.shouldGenerateTag()) {
@@ -178,11 +174,18 @@ oc.handleCalaisResponse = function(responseString) {
 		oc.tagManager.normalizeRelevance();
 
 		jQuery.each(newTags, function(i, tag) {
-			if (oc.relevanceIsSufficient(tag.source.getNormalizedRelevance())) {
-				oc.tagManager.putTagInSuggested(tag, 'auto');
-			}
-			else {
-				oc.tagManager.putTagInBlacklist(tag, 'auto');
+			// if the tag type is set and its 0 or the type is an EventFact and its 0, don't display the tag
+			if ( !(
+				( oc.allowedTagTypes.hasOwnProperty(tag.type) && 0 == oc.allowedTagTypes[tag.type] )
+				||
+				( 'EventFact' === tag.source._className && 0 == oc.allowedTagTypes.EventFact )
+			)) {
+				if (oc.relevanceIsSufficient(tag.source.getNormalizedRelevance())) {
+					oc.tagManager.putTagInSuggested(tag, 'auto');
+				}
+				else {
+					oc.tagManager.putTagInBlacklist(tag, 'auto');
+				}
 			}
 		});
 
@@ -334,8 +337,8 @@ oc.tagAutocompleteHandler = function() {
 
 oc.updateArchiveField = function() {
 	var v = '{\
-		version:\'' + oc.getFormatVersion() + '\',\
-		tags: ' + oc.tagManager.getSerializedTags() + '\
+		"version":"' + oc.getFormatVersion() + '",\
+		"tags": ' + oc.tagManager.getSerializedTags() + '\
 	}';
 	jQuery('#tags-input').val(oc.tagManager.tagsAsCSV('current'));
 	jQuery('#oc_metadata').val(v);

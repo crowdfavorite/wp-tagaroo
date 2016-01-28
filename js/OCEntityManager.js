@@ -11,26 +11,26 @@ oc.EntityManager = CFBase.extend({
 			type:[{'rdf:resource': archivedArtifact.type.url}],
 			name:[{Text: archivedArtifact.name}]
 		};
-		
-		// cheesy way to tell if the archived artifact is an entity or event/fact		
+
+		// cheesy way to tell if the archived artifact is an entity or event/fact
 		if (typeof(archivedArtifact.targetEntityURL) != 'undefined') {
 			var eventFact = oc.entityManager.eventFactFromDescription(fakeDesc);
 			if (eventFact) {
 				this.eventFactMap[eventFact.url] = eventFact;
-			}			
+			}
 		}
 		else {
 			var entity = oc.entityManager.entityFromDescription(fakeDesc);
 			if (entity) {
 				this.entityMap[entity.url] = entity;
-			}			
+			}
 		}
 	},
 
 	generateArtifacts: function(descriptions) {
 		var poppet = this;
 		var resultArray = [];
-		
+
 		// make one pass creating all the entities
 		jQuery.each(descriptions, function(i, desc) {
 			var newEntity = poppet.entityFromDescription(desc);
@@ -38,8 +38,8 @@ oc.EntityManager = CFBase.extend({
 				poppet.entityMap[newEntity.url] = newEntity;
 				resultArray.push(newEntity);
 			}
-		});	
-		
+		});
+
 		// make a second pass creating events/facts and attaching them to entities if appropriate
 		jQuery.each(descriptions, function(i, desc) {
 			if (poppet.isEventFactDescription(desc)) {
@@ -57,10 +57,10 @@ oc.EntityManager = CFBase.extend({
 					resultArray.push(newEventFact);
 				}
 			}
-		});		
+		});
 		return resultArray;
 	},
-	
+
 	deleteArtifact: function(artifact) {
 		if (this.entityMap[artifact.url]) {
 			delete this.entityMap[artifact.url];
@@ -69,7 +69,7 @@ oc.EntityManager = CFBase.extend({
 			delete this.eventFactMap[artifact.url];
 		}
 	},
-	
+
 	entityFromDescription: function(rdfDescription) {
 		// for now we assume that entities have names.
 		if (rdfDescription.name) {
@@ -83,7 +83,7 @@ oc.EntityManager = CFBase.extend({
 		}
 		return null;
 	},
-	
+
 	eventFactFromDescription: function(rdfDescription) {
 		var url = rdfDescription['rdf:about'];
 		if (this.eventFactMap[url]) {
@@ -93,8 +93,8 @@ oc.EntityManager = CFBase.extend({
 			return new oc.EventFact(rdfDescription);
 		}
 	},
-	
-		
+
+
 	isEventFactDescription: function(rdfDescription) {
 		var url = rdfDescription['rdf:about'];
 		// ignore anything with a name
@@ -103,7 +103,7 @@ oc.EntityManager = CFBase.extend({
 		}
 		return null;
 	},
-		
+
 	createArtifactTypeIfNew: function(typeURL) {
 		if (typeURL) {
 			var name = typeURL.substring(typeURL.lastIndexOf('/') + 1);
@@ -117,19 +117,19 @@ oc.EntityManager = CFBase.extend({
 		}
 		return null;
 	},
-	
+
 	registerArtifactType: function(artifactType) {
 		this.artifactTypes[artifactType.name] = artifactType;
 	},
-	
+
 	getArtifactTypeNames: function() {
 		var names = [];
 		for (var name in this.artifactTypes) {
 			names.push(name);
 		}
 		return names;
-	},	
-	
+	},
+
 	getArtifacts: function() {
 		var result = [];
 		for(var url in this.entityMap) {
@@ -140,16 +140,16 @@ oc.EntityManager = CFBase.extend({
 		}
 		return result;
 	},
-	
+
 	// maps from RDF:description url to artifact objects
 	entityMap: {},
 	eventFactMap: {},
-	
+
 	// all known artifact types for this post. maps from artifact type name to ArtifactType object
 	artifactTypes: {},
 
 	artifactDisplayInfo: {
-				
+
 		// these are the event/facts we turn into tags, and also their display text
 		eventFactDisplayText: {
 			Acquisition: 'Acquisition',

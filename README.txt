@@ -3,7 +3,7 @@ Tags: tag, tags, tagging, semantic data, photo, photos, pictures, Flickr, calais
 Contributors: alexkingorg, crowdfavorite
 Requires at least: 2.7
 Tested up to: 4.2
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,10 +42,22 @@ Clicking on a photo will show you a larger preview of the photo, and you can cho
 
 == Changelog ==
 
+= 1.5.1 =
+
+* Fix issue pertaining to adding tags
+* Social Tags now link to their appropriate wikipedia page
+* Adjust how articles communicate with the Calais API to give better suggestions
+* Consolidate certain categories (Person, Geography, M&A, Entities)
+* Add setting to disable suggestion of certain tag categories
+
 = 1.5.0 =
 
-* Upgrade enpoints to use the new OpenCalais API
+* Upgrade endpoints to use the new OpenCalais API
 * Implement PermID Company tags and their display on the frontend.
+
+= 1.4.9 =
+
+* Add filter to support multiple post types for the tagaroo meta boxes
 
 = 1.4.8 =
 

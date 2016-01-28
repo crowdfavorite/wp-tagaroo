@@ -15,27 +15,36 @@ oc.TagSource = CFBase.extend({
 		// make sure we're hooked up to the right object
 		this.type = oc.artifactManager.createArtifactTypeIfNew(this.type.url);
 	},
-	
+
 	getTagText: function() {
 		return this.name;
 	},
-	
+
 	getTagTypeName: function() {
 		return this.type.name;
 	},
-	
+
 	getTagTypeIconURL: function() {
 		return '';
 	},
-	
+
 	getTagTypeClassName: function() {
-		return cf.slugify(this.getTagTypeName());
+		var tagTypeName = this.getTagTypeName();
+		// This accounts for entities living beneath another. Ex: City under Geography
+		var typeName = this.type.name;
+
+		if ( tagTypeName == typeName ) {
+			return cf.slugify(tagTypeName);
+		}
+		else {
+			return cf.slugify(typeName);
+		}
 	},
-	
+
 	isAmbiguous: function() {
 		return false;
 	},
-	
+
 	getSubjectURL: function() {
 		return this.subjectURL;
 	},
@@ -53,9 +62,9 @@ oc.TagSource = CFBase.extend({
 	},
 
 	/**
-	 * We're going to stand in for the passed artifact. Weirdly the ambiguous 
+	 * We're going to stand in for the passed artifact. Weirdly the ambiguous
 	 * artifact is the one who gets the relevance, etc.
-	 * 
+	 *
 	 * Probably the artifact will always be an entity; may make sense to put this up
 	 * in Entity rather than here.
 	 */
@@ -64,15 +73,15 @@ oc.TagSource = CFBase.extend({
 			this.setRawRelevance(artifact.getRawRelevance());
 		}
 	},
-	
+
 	shouldGenerateTag: function() {
 		return this.makeMeATag;
 	},
-	
+
 	shouldUseForImageSearch: function() {
 		return true;
 	},
-	
+
 	url: '',
 	type: null,
 	subjectURL: '',
