@@ -1019,7 +1019,9 @@ function oc_save_post( $post_id, $post ) {
 add_action( 'save_post', 'oc_save_post', 10, 2 );
 
 function oc_filter_content( $content ) {
-	include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
+	if ( ! class_exists( 'simple_html_dom_node' ) ) {
+		include_once( OC_FILE_PATH . 'vendor/simple_html_dom.php' );
+	}
 	global $post;
 	$footer_markup = false;
 	$preg_pattern = false;
